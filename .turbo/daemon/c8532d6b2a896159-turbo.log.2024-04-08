@@ -1,0 +1,1 @@
+2024-04-08T09:41:50.572248Z  WARN turborepo_filewatch: encountered error watching filesystem enumerating recursive watch: IO error for operation on /home/tirivashe/Web Dev Learning/Typescript/Full stack/auction-app/node_modules/.pnpm/mongodb@6.5.0/node_modules/mongodb_tmp_81984/lib/cmap/handshake: No such file or directory (os error 2)
