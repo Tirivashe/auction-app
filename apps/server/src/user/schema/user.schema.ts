@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
 import { UserSettings } from './user-settings.schema';
 
 export type UserDocument = HydratedDocument<User>;
@@ -9,7 +9,7 @@ enum Role {
   Regular = 'Regular',
 }
 @Schema()
-export class User {
+export class User extends Document {
   @Prop({ required: true })
   username: string;
 

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
 import { Item } from 'src/item/schema/item.schema';
 import { User } from 'src/user/schema/user.schema';
 import { Bid } from './bid.schema';
@@ -12,7 +12,7 @@ enum Status {
   InProgress = 'in_progress',
 }
 @Schema()
-export class BiddingHistory {
+export class BiddingHistory extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user: User;
 

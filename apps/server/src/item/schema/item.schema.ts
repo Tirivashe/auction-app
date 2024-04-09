@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 
 export type ItemDocument = HydratedDocument<Item>;
 
 @Schema({ timestamps: true })
-export class Item {
+export class Item extends Document {
   @Prop({ required: true })
   name: string;
 
