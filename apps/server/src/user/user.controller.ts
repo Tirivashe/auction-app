@@ -16,6 +16,11 @@ export class UserController {
     return this.userService.findOne(email);
   }
 
+  @Get('settings/:id')
+  async findUserSettingsById(@Param('id') id: string) {
+    return this.userService.findUserSettingsById(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
