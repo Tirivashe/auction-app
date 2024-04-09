@@ -21,6 +21,11 @@ export class UserController {
     return this.userService.findUserSettingsById(id);
   }
 
+  @Get('history/:id')
+  async getBiddingHistory(@Param('id') userId: string) {
+    return this.userService.getBiddingHistory(userId);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);

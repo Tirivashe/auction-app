@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.schema';
 import { Model } from 'mongoose';
 import { UserSettings } from './schema/user-settings.schema';
+import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 
 @Injectable()
 export class UserService {
@@ -12,6 +13,8 @@ export class UserService {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(UserSettings.name)
     private userSettingsModel: Model<UserSettings>,
+    @InjectModel(BiddingHistory.name)
+    private readonly biddingHistoryModel: Model<BiddingHistory>,
   ) {}
   async create(createUserDto: CreateUserDto) {
     const res = await this.userModel.create(createUserDto);
@@ -34,6 +37,13 @@ export class UserService {
   async findUserSettingsById(id: string) {
     const user = await this.userModel.findById(id);
     return await this.userSettingsModel.find({ user: user._id });
+  }
+
+  async getBiddingHistory(userId: string) {
+    return await this.biddingHistoryModel
+      .find({ user: userId })
+      .populate('bid')
+      .populate('item');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

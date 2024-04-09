@@ -7,12 +7,17 @@ import {
   UserSettings,
   UserSettingsSchema,
 } from './schema/user-settings.schema';
+import {
+  BiddingHistory,
+  BiddingHistorySchema,
+} from 'src/bid/schema/bid-history.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: UserSettings.name, schema: UserSettingsSchema },
+      { name: BiddingHistory.name, schema: BiddingHistorySchema },
     ]),
   ],
   controllers: [UserController],
