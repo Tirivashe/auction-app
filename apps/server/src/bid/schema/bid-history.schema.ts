@@ -3,14 +3,10 @@ import mongoose, { Document, HydratedDocument } from 'mongoose';
 import { Item } from 'src/item/schema/item.schema';
 import { User } from 'src/user/schema/user.schema';
 import { Bid } from './bid.schema';
+import { Status } from 'src/types';
 
 export type BiddingHistoryDocument = HydratedDocument<BiddingHistory>;
 
-enum Status {
-  Won = 'won',
-  Lost = 'lost',
-  InProgress = 'in_progress',
-}
 @Schema()
 export class BiddingHistory extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })

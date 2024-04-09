@@ -1,8 +1,4 @@
-// TODO: add validation and extract enum to another file
-enum Role {
-  Admin = 'Admin',
-  Regular = 'Regular',
-}
+import { Role } from 'src/types';
 
 export class CreateUserDto {
   username: string;
