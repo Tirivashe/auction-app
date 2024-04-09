@@ -15,7 +15,7 @@ export class ItemService {
       name = '',
       order = 'DESC',
       page = 1,
-      limit = 2,
+      limit = 10,
     } = queryParams;
     const skip = limit * (page - 1);
     const items = await this.itemModel
