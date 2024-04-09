@@ -6,7 +6,7 @@ import { User, UserSchema } from './schema/user.schema';
 import {
   UserSettings,
   UserSettingsSchema,
-} from './schema/user-preference.schema';
+} from './schema/user-settings.schema';
 
 @Module({
   imports: [
