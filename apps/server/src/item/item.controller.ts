@@ -14,6 +14,7 @@ import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
+import { PlaceBidDto } from './dto/place-bid.dto';
 
 @Controller()
 export class ItemController {
@@ -28,6 +29,12 @@ export class ItemController {
   @HttpCode(HttpStatus.CREATED)
   async createItem(@Body() createItemDto: CreateItemDto) {
     return await this.itemService.createItem(createItemDto);
+  }
+
+  @Post('item/:id/bid')
+  @HttpCode(HttpStatus.CREATED)
+  async placeBid(@Body() placeBid: PlaceBidDto, @Param('id') itemId: string) {
+    return await this.itemService.placeBid(itemId, placeBid);
   }
 
   @Patch('item/:id')
