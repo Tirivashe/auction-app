@@ -8,18 +8,20 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { QueryParamsDto } from './dto/query-params.dto';
 
 @Controller()
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Get('items')
-  async getAllItems() {
-    return await this.itemService.getAllItems();
+  async getAllItems(@Query() queryParams: QueryParamsDto) {
+    return await this.itemService.getAllItems(queryParams);
   }
 
   @Post('item')
