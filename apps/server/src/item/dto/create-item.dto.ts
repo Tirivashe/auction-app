@@ -3,4 +3,6 @@ export class CreateItemDto {
   description: string;
   price: number;
   image: string;
+  expiresAt: Date;
+  isActive?: boolean;
 }
