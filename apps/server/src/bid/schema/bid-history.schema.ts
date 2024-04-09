@@ -28,6 +28,9 @@ export class BiddingHistory extends Document {
     default: Status.InProgress,
   })
   bidStatus: Status;
+
+  @Prop({ default: false, required: false })
+  autobid?: boolean;
 }
 
 export const BiddingHistorySchema =

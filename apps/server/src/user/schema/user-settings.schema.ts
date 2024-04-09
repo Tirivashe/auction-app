@@ -13,9 +13,6 @@ export class UserSettings {
   })
   user: User;
 
-  @Prop({ default: false, required: false })
-  isAutoBidEnabled?: boolean;
-
   @Prop({
     required: false,
     type: mongoose.Schema.Types.Number,
