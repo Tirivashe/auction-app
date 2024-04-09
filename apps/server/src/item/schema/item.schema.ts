@@ -18,7 +18,7 @@ export class Item {
   price: number;
 
   @Prop({ required: true })
-  expires_at: Date;
+  expiresAt: Date;
 
   @Prop({ default: true })
   isActive: boolean;
