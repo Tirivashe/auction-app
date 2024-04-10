@@ -1,6 +1,7 @@
 import { Controller, Get, Patch, Param, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ToggleAutobidDto } from 'src/item/dto/toggle-autobid.dto';
+import { UserSettingsDto } from './dto/user-settings.dto';
 
 @Controller('user')
 export class UserController {
@@ -31,13 +32,11 @@ export class UserController {
     return this.userService.toggleAutobid(toggleAutobidDto);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userService.remove(+id);
-  // }
+  @Patch(':id/settings')
+  async setUserSettings(
+    @Param('id') userId: string,
+    @Body() userSettingsDto: UserSettingsDto,
+  ) {
+    return this.userService.setUserSettings(userId, userSettingsDto);
+  }
 }

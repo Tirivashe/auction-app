@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { UserSettings } from './schema/user-settings.schema';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { ToggleAutobidDto } from 'src/item/dto/toggle-autobid.dto';
+import { UserSettingsDto } from './dto/user-settings.dto';
 
 @Injectable()
 export class UserService {
@@ -38,6 +39,16 @@ export class UserService {
   async findUserSettingsById(id: string) {
     const user = await this.userModel.findById(id);
     return await this.userSettingsModel.find({ user: user._id });
+  }
+
+  async setUserSettings(userId: string, userSettingsDto: UserSettingsDto) {
+    await this.userSettingsModel.updateOne({ user: userId }, userSettingsDto);
+
+    return {
+      message: 'User settings updated',
+      statusCode: HttpStatus.OK,
+      error: null,
+    };
   }
 
   async getBiddingHistory(userId: string) {
