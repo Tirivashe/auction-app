@@ -42,7 +42,16 @@ export class UserService {
   }
 
   async setUserSettings(userId: string, userSettingsDto: UserSettingsDto) {
-    await this.userSettingsModel.updateOne({ user: userId }, userSettingsDto);
+    const userSettings = await this.userSettingsModel.findOne({ user: userId });
+    if (!userSettings) {
+      await this.userSettingsModel.create({ user: userId, ...userSettingsDto });
+    } else {
+      await this.userSettingsModel.findOneAndUpdate(
+        { user: userId },
+        { $set: userSettingsDto },
+        { new: true },
+      );
+    }
 
     return {
       message: 'User settings updated',
