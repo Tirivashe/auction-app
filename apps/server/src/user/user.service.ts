@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -53,7 +53,7 @@ export class UserService {
       item: toggleAutobidDto.itemId,
     });
     if (!userBid) {
-      throw new NotFoundException('Bid not found');
+      return;
     }
     userBid.autobid = !userBid.autobid;
     await userBid.save();

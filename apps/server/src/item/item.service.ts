@@ -136,7 +136,7 @@ export class ItemService {
           user: placeBidDto.userId,
           item: itemId,
           bidStatus: Status.InProgress,
-          autobid: false,
+          autobid: placeBidDto.autobid || false,
         });
         newBiddingHistory.bids.push(newBid);
         await newBiddingHistory.save({ session });
