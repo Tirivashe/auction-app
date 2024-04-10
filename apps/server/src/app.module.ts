@@ -6,10 +6,14 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ItemModule } from './item/item.module';
 import { BidModule } from './bid/bid.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/'),
+    EventEmitterModule.forRoot(),
+    MongooseModule.forRoot(
+      'mongodb://127.0.0.1:27017/tiri?directConnection=true',
+    ),
     UserModule,
     AuthModule,
     ItemModule,
