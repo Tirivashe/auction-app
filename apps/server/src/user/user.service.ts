@@ -42,7 +42,7 @@ export class UserService {
   async getBiddingHistory(userId: string) {
     return await this.biddingHistoryModel
       .find({ user: userId })
-      .populate('bid')
+      .populate('bids')
       .populate('item');
   }
 

@@ -110,6 +110,7 @@ export class ItemService {
     )[0];
   }
 
+  // TODO: Lower the lines of code down to 30
   private async createBid(itemId: string, placeBidDto: PlaceBidDto) {
     const session = await this.connection.startSession();
     session.startTransaction();
@@ -131,7 +132,11 @@ export class ItemService {
           bidStatus: Status.InProgress,
           autobid: false,
         });
+        newBiddingHistory.bids.push(newBid);
         await newBiddingHistory.save({ session });
+      } else {
+        existingBiddingHistory.bids.push(newBid);
+        await existingBiddingHistory.save({ session });
       }
       await newBid.save({ session });
       await session.commitTransaction();
