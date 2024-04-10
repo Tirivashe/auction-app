@@ -1,4 +1,4 @@
 export class UserSettingsDto {
-  autoBidAmount?: number;
+  maxBidAmount?: number;
   autoBidPercentage?: number;
 }

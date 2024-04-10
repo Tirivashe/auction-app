@@ -19,7 +19,7 @@ export class UserSettings {
     min: 0,
     default: null,
   })
-  autoBidAmount?: number;
+  maxBidAmount?: number;
 
   @Prop({
     required: false,
