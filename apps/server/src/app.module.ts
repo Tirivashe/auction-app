@@ -8,6 +8,7 @@ import { ItemModule } from './item/item.module';
 import { BidModule } from './bid/bid.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
+// TODO: Change the mongo connection string to mongo atlas later
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
