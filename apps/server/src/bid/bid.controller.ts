@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { BidService } from './bid.service';
+import { BidPlacedEvent } from 'src/events/bid-placed.event';
 
 @Controller()
 export class BidController {
@@ -8,5 +9,10 @@ export class BidController {
   @Get('bids')
   async getAllBids() {
     return await this.bidService.getAllBids();
+  }
+
+  @Post('autobid')
+  async autobidForUser(payload: BidPlacedEvent) {
+    return await this.bidService.autobidForUser(payload);
   }
 }

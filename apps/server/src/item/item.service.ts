@@ -9,6 +9,7 @@ import { PlaceBidDto } from './dto/place-bid.dto';
 import { Bid } from 'src/bid/schema/bid.schema';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Status } from 'src/types';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ItemService {
@@ -18,6 +19,7 @@ export class ItemService {
     @InjectModel(BiddingHistory.name)
     private readonly biddingHistoryModel: Model<BiddingHistory>,
     @InjectConnection() private connection: Connection,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
   async getAllItems(queryParams: QueryParamsDto): Promise<Item[]> {
     const {
@@ -55,6 +57,10 @@ export class ItemService {
     );
     if (!canBid) throw new BadRequestException(message);
     await this.createBid(itemId, placeBidDto);
+    this.eventEmitter.emit('bid.created', {
+      itemId,
+      ...placeBidDto,
+    });
     return { message: 'Bid created', status: HttpStatus.CREATED };
   }
 
@@ -83,7 +89,7 @@ export class ItemService {
           message: 'You are currently the highest bidder on this item',
         };
       }
-      if (highestBid.bidAmount + 1 >= placeBidDto.amount) {
+      if (highestBid.bidAmount >= placeBidDto.amount) {
         return {
           canBid: false,
           message: 'Place a bid higher than the current highest bid amount',
