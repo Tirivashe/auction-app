@@ -1,6 +1,6 @@
-import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ToggleAutobidDto } from 'src/item/dto/toggle-autobid.dto';
 
 @Controller('user')
 export class UserController {
@@ -26,13 +26,18 @@ export class UserController {
     return this.userService.getBiddingHistory(userId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Patch('/toggle-autobid')
+  async toggleAutobid(@Body() toggleAutobidDto: ToggleAutobidDto) {
+    return this.userService.toggleAutobid(toggleAutobidDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.userService.update(+id, updateUserDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.userService.remove(+id);
+  // }
 }

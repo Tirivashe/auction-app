@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,7 @@ import { User } from './schema/user.schema';
 import { Model } from 'mongoose';
 import { UserSettings } from './schema/user-settings.schema';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
+import { ToggleAutobidDto } from 'src/item/dto/toggle-autobid.dto';
 
 @Injectable()
 export class UserService {
@@ -44,6 +45,23 @@ export class UserService {
       .find({ user: userId })
       .populate('bids')
       .populate('item');
+  }
+
+  async toggleAutobid(toggleAutobidDto: ToggleAutobidDto) {
+    const userBid = await this.biddingHistoryModel.findOne({
+      user: toggleAutobidDto.userId,
+      item: toggleAutobidDto.itemId,
+    });
+    if (!userBid) {
+      throw new NotFoundException('Bid not found');
+    }
+    userBid.autobid = !userBid.autobid;
+    await userBid.save();
+    return {
+      message: 'Auto-bid changed',
+      statusCode: HttpStatus.OK,
+      error: null,
+    };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
