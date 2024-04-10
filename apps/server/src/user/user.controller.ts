@@ -16,12 +16,12 @@ export class UserController {
     return this.userService.findOne(email);
   }
 
-  @Get('settings/:id')
+  @Get('/:id/settings')
   async findUserSettingsById(@Param('id') id: string) {
     return this.userService.findUserSettingsById(id);
   }
 
-  @Get('history/:id')
+  @Get('/:id/history')
   async getBiddingHistory(@Param('id') userId: string) {
     return this.userService.getBiddingHistory(userId);
   }
