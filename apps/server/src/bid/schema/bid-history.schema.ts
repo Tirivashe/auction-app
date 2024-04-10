@@ -15,8 +15,12 @@ export class BiddingHistory extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: true })
   item: Item;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Bid', required: true })
-  bid: Bid;
+  @Prop({
+    type: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Bid', required: true },
+    ],
+  })
+  bids: Bid[];
 
   @Prop({
     enum: ['won', 'lost', 'in_progress'],
