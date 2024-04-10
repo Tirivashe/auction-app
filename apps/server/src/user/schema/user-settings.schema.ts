@@ -24,6 +24,14 @@ export class UserSettings {
   @Prop({
     required: false,
     type: mongoose.Schema.Types.Number,
+    min: 0,
+    default: 0,
+  })
+  totalAmountReserved?: number;
+
+  @Prop({
+    required: false,
+    type: mongoose.Schema.Types.Number,
     max: 100,
     min: 0,
     default: 0,
