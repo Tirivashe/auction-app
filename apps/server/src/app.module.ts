@@ -8,6 +8,7 @@ import { ItemModule } from './item/item.module';
 import { BidModule } from './bid/bid.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './notification/notification.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 // TODO: Change the mongo connection string to mongo atlas later
@@ -23,6 +24,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ItemModule,
     BidModule,
     NotificationModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
