@@ -45,6 +45,7 @@ export class ItemService {
     const { expiresAt, ...rest } = createItemDto;
     const date = new Date(expiresAt);
     await this.itemModel.create({ expiresAt: date, ...rest });
+    this.eventEmitter.emit('item.created');
     return { message: 'Item created', status: HttpStatus.CREATED };
   }
 
