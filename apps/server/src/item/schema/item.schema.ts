@@ -25,7 +25,10 @@ export class Item extends Document {
   isActive: boolean;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null })
-  awardedTo: User;
+  winner: User;
+
+  @Prop({ default: null })
+  awardedFor: number;
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);
