@@ -11,9 +11,11 @@ import {
   UserSettings,
   UserSettingsSchema,
 } from 'src/user/schema/user-settings.schema';
+import { ItemModule } from 'src/item/item.module';
 
 @Module({
   imports: [
+    ItemModule,
     MongooseModule.forFeature([
       { name: Bid.name, schema: BidSchema },
       { name: BiddingHistory.name, schema: BiddingHistorySchema },

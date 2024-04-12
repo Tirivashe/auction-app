@@ -2,7 +2,7 @@ import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Item } from './schema/item.schema';
-import { Connection, Model } from 'mongoose';
+import { ClientSession, Connection, Model } from 'mongoose';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { PlaceBidDto } from './dto/place-bid.dto';
@@ -63,10 +63,19 @@ export class ItemService {
       placeBidDto,
     );
     if (!canBid) throw new BadRequestException(message);
-    await this.createBid(itemId, placeBidDto);
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await this.createBid(itemId, placeBidDto, session);
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
     this.eventEmitter.emit(BidEvents.CREATED, {
       itemId,
-      ...placeBidDto,
+      placeBidDto,
     });
     return { message: 'Bid created', status: HttpStatus.CREATED };
   }
@@ -88,7 +97,10 @@ export class ItemService {
   @OnEvent(BidEvents.CLOSED)
   async awardItemToHighestBidder(itemId: string) {
     const highestBid = await this.getHighestBidForItem(itemId);
-    if (!highestBid) return;
+    if (!highestBid) {
+      this.eventEmitter.emit(ItemEvents.ITEM_NOT_AWARDED);
+      return;
+    }
     const item = await this.itemModel.findById(itemId);
     if (!item) return;
     item.winner = highestBid.user._id;
@@ -140,40 +152,35 @@ export class ItemService {
   }
 
   // TODO: Lower the lines of code down to 30
-  private async createBid(itemId: string, placeBidDto: PlaceBidDto) {
-    const session = await this.connection.startSession();
-    session.startTransaction();
-    try {
-      const existingBiddingHistory = await this.biddingHistoryModel.findOne({
-        item: itemId,
+  async createBid(
+    itemId: string,
+    placeBidDto: PlaceBidDto,
+    session: ClientSession,
+  ) {
+    const existingBiddingHistory = await this.biddingHistoryModel.findOne({
+      item: itemId,
+      user: placeBidDto.userId,
+    });
+    const newBid: Bid = new this.bidModel({
+      $session: session,
+      item: itemId,
+      bidAmount: placeBidDto.amount,
+      user: placeBidDto.userId,
+    });
+    if (!existingBiddingHistory) {
+      const newBiddingHistory: BiddingHistory = new this.biddingHistoryModel({
+        bid: newBid._id,
         user: placeBidDto.userId,
-      });
-      const newBid: Bid = new this.bidModel({
-        user: placeBidDto.userId,
         item: itemId,
-        bidAmount: placeBidDto.amount,
+        bidStatus: Status.InProgress,
+        autobid: placeBidDto.autobid || false,
       });
-      if (!existingBiddingHistory) {
-        const newBiddingHistory: BiddingHistory = new this.biddingHistoryModel({
-          bid: newBid._id,
-          user: placeBidDto.userId,
-          item: itemId,
-          bidStatus: Status.InProgress,
-          autobid: placeBidDto.autobid || false,
-        });
-        newBiddingHistory.bids.push(newBid);
-        await newBiddingHistory.save({ session });
-      } else {
-        existingBiddingHistory.bids.push(newBid);
-        await existingBiddingHistory.save({ session });
-      }
-      await newBid.save({ session });
-      await session.commitTransaction();
-    } catch (err) {
-      await session.abortTransaction();
-      throw err;
-    } finally {
-      session.endSession();
+      newBiddingHistory.bids.push(newBid);
+      await newBiddingHistory.save({ session });
+    } else {
+      existingBiddingHistory.bids.push(newBid);
+      await existingBiddingHistory.save({ session });
     }
+    await newBid.save({ session });
   }
 }
