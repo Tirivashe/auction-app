@@ -1,27 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { CreateItemDto } from 'src/item/dto/create-item.dto';
 import * as dayjs from 'dayjs';
+import { UpdateItemDto } from 'src/item/dto/update-item.dto';
+import { ItemEvents } from 'src/item/events/item-events';
+import { Item } from 'src/item/schema/item.schema';
 
 const EXECUTION_DELAY = 1;
 
 @Injectable()
 export class SchedulerService {
-  constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
-  @OnEvent('item.created')
-  onItemCreated(data: CreateItemDto) {
-    const timeout =
-      dayjs(data.expiresAt).valueOf() - Date.now() + EXECUTION_DELAY;
-    this.addTimeout(data.name, timeout);
+  constructor(
+    private readonly schedulerRegistry: SchedulerRegistry,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
+
+  @OnEvent(ItemEvents.CREATED)
+  onItemCreated(item: Item) {
+    const timeoutDuration =
+      dayjs(item.expiresAt).valueOf() - Date.now() + EXECUTION_DELAY;
+    this.addTimeout(item._id.toString(), timeoutDuration);
+  }
+  @OnEvent(ItemEvents.UPDATED)
+  onItemUpdated({
+    id,
+    updateItemDto,
+  }: {
+    id: string;
+    updateItemDto: UpdateItemDto;
+  }) {
+    if (!updateItemDto.expiresAt) return;
+    this.schedulerRegistry.deleteTimeout(id);
+    const timeoutDuration =
+      dayjs(updateItemDto.expiresAt).valueOf() - Date.now() + EXECUTION_DELAY;
+    this.addTimeout(id, timeoutDuration);
   }
 
-  private addTimeout(name: string, milliseconds: number) {
+  @OnEvent(ItemEvents.DELETED)
+  onItemDeleted(id: string) {
+    this.schedulerRegistry.deleteTimeout(id);
+  }
+
+  private addTimeout(id: string, milliseconds: number) {
     const callback = () => {
-      console.log(`Timeout ${name} executing after (${milliseconds})!`);
+      this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, id);
     };
 
     const timeout = setTimeout(callback, milliseconds);
-    this.schedulerRegistry.addTimeout(name, timeout);
+    this.schedulerRegistry.addTimeout(id, timeout);
   }
 }

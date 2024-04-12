@@ -9,7 +9,8 @@ import { PlaceBidDto } from './dto/place-bid.dto';
 import { Bid } from 'src/bid/schema/bid.schema';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Status } from 'src/types';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { ItemEvents } from './events/item-events';
 
 @Injectable()
 export class ItemService {
@@ -37,15 +38,19 @@ export class ItemService {
       })
       .sort({ price: order === 'ASC' ? 'asc' : 'desc' })
       .limit(limit)
-      .skip(skip);
+      .skip(skip)
+      .populate('winner');
     return items;
   }
 
   async createItem(createItemDto: CreateItemDto) {
     const { expiresAt, ...rest } = createItemDto;
     const date = new Date(expiresAt);
-    await this.itemModel.create({ expiresAt: date, ...rest });
-    this.eventEmitter.emit('item.created', createItemDto);
+    const createdItem: Item = await this.itemModel.create({
+      expiresAt: date,
+      ...rest,
+    });
+    this.eventEmitter.emit(ItemEvents.CREATED, createdItem);
     return { message: 'Item created', status: HttpStatus.CREATED };
   }
 
@@ -58,7 +63,7 @@ export class ItemService {
     );
     if (!canBid) throw new BadRequestException(message);
     await this.createBid(itemId, placeBidDto);
-    this.eventEmitter.emit('bid.created', {
+    this.eventEmitter.emit(ItemEvents.BID_CREATED, {
       itemId,
       ...placeBidDto,
     });
@@ -70,11 +75,27 @@ export class ItemService {
       { _id: id },
       updateItemDto,
     );
+    this.eventEmitter.emit(ItemEvents.UPDATED, { id, updateItemDto });
     return updatedItem;
   }
   async deleteItem(id: string) {
     await this.itemModel.deleteOne({ _id: id });
+    this.eventEmitter.emit(ItemEvents.DELETED, id);
     return { message: 'Item Deleted', status: HttpStatus.OK };
+  }
+
+  @OnEvent(ItemEvents.ITEM_AWARDED)
+  async awardItemToHighestBidder(itemId: string) {
+    const highestBid = await this.getHighestBidForItem(itemId);
+    if (!highestBid) return;
+    const item = await this.itemModel.findById(itemId);
+    if (!item) return;
+    item.winner = highestBid.user._id;
+    item.awardedFor = highestBid.bidAmount;
+    item.isActive = false;
+    await item.save();
+    console.log('Item awarded!!!');
+    // this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, itemId);
   }
 
   private async canPlaceBid(
