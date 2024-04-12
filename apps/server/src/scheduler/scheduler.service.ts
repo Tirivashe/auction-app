@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
+import { BidEvents } from 'src/bid/events/bid-events';
 import { UpdateItemDto } from 'src/item/dto/update-item.dto';
 import { ItemEvents } from 'src/item/events/item-events';
 import { Item } from 'src/item/schema/item.schema';
@@ -43,7 +44,7 @@ export class SchedulerService {
 
   private addTimeout(id: string, milliseconds: number) {
     const callback = () => {
-      this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, id);
+      this.eventEmitter.emit(BidEvents.CLOSED, id);
     };
 
     const timeout = setTimeout(callback, milliseconds);

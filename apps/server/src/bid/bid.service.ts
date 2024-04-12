@@ -6,6 +6,7 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { BidPlacedEvent } from 'src/events/bid-placed.event';
 import { BiddingHistory } from './schema/bid-history.schema';
 import { UserSettings } from 'src/user/schema/user-settings.schema';
+import { BidEvents } from './events/bid-events';
 
 @Injectable()
 export class BidService {
@@ -24,7 +25,7 @@ export class BidService {
   }
 
   // TODO: Make this run concurrently correctly and reduce complexity
-  @OnEvent('bid.created', { async: true })
+  @OnEvent(BidEvents.CREATED, { async: true })
   async autobidForUser(payload: BidPlacedEvent) {
     const nextBidAmount = payload.amount + 1;
     const userList = await this.usersWithAutobidEnabled(payload);
@@ -64,10 +65,13 @@ export class BidService {
     } finally {
       session.endSession();
     }
-    this.eventEmitter.emitAsync('autobid.created', { nextBidAmount, payload });
+    this.eventEmitter.emit(BidEvents.AUTO_BID_CREATED, {
+      nextBidAmount,
+      payload,
+    });
   }
 
-  @OnEvent('autobid.created', { async: true })
+  @OnEvent(BidEvents.AUTO_BID_CREATED, { async: true })
   async onAutobidCreated({
     nextBidAmount,
     payload,
@@ -90,7 +94,7 @@ export class BidService {
         (settings?.totalAmountReserved / settings?.maxBidAmount) * 100;
 
       if (percentageOfMax >= settings?.autoBidPercentage) {
-        this.eventEmitter.emit('autobid.reached', user._id, {
+        this.eventEmitter.emit(BidEvents.AUTO_BID_REACHED, user._id, {
           once: true,
         });
       }
@@ -98,7 +102,7 @@ export class BidService {
         settings?.totalAmountReserved + nextBidAmount >=
         settings?.maxBidAmount
       ) {
-        this.eventEmitter.emit('autobid.exceeded', user._id);
+        this.eventEmitter.emit(BidEvents.AUTO_BID_EXCEDDED, user._id);
       }
     }
   }

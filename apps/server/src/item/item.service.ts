@@ -11,6 +11,7 @@ import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Status } from 'src/types';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ItemEvents } from './events/item-events';
+import { BidEvents } from 'src/bid/events/bid-events';
 
 @Injectable()
 export class ItemService {
@@ -63,7 +64,7 @@ export class ItemService {
     );
     if (!canBid) throw new BadRequestException(message);
     await this.createBid(itemId, placeBidDto);
-    this.eventEmitter.emit(ItemEvents.BID_CREATED, {
+    this.eventEmitter.emit(BidEvents.CREATED, {
       itemId,
       ...placeBidDto,
     });
@@ -84,7 +85,7 @@ export class ItemService {
     return { message: 'Item Deleted', status: HttpStatus.OK };
   }
 
-  @OnEvent(ItemEvents.ITEM_AWARDED)
+  @OnEvent(BidEvents.CLOSED)
   async awardItemToHighestBidder(itemId: string) {
     const highestBid = await this.getHighestBidForItem(itemId);
     if (!highestBid) return;
@@ -95,7 +96,7 @@ export class ItemService {
     item.isActive = false;
     await item.save();
     console.log('Item awarded!!!');
-    // this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, itemId);
+    this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, itemId);
   }
 
   private async canPlaceBid(
