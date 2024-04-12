@@ -20,7 +20,7 @@ export class BidService {
   ) {}
 
   async getAllBids() {
-    return await this.bidModel.find();
+    return await this.bidModel.find().populate('user').populate('item');
   }
 
   // TODO: Make this run concurrently correctly and reduce complexity
