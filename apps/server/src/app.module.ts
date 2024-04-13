@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -13,6 +11,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { EmailerModule } from './emailer/emailer.module';
 import { ConfigModule } from '@nestjs/config';
 import { BillingModule } from './billing/billing.module';
+import { BiddingModule } from './bidding/bidding.module';
 
 // TODO: Change the mongo connection string to mongo atlas later
 @Module({
@@ -31,8 +30,7 @@ import { BillingModule } from './billing/billing.module';
     SchedulerModule,
     EmailerModule,
     BillingModule,
+    BiddingModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
