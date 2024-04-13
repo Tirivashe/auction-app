@@ -33,7 +33,10 @@ export class EmailerService {
 
       for (const user of usersBiddingOnItem) {
         if (user.user._id.toString() === highestBid.user._id.toString()) {
-          this.eventEmitter.emit(BillingEvents.CREATE, user);
+          this.eventEmitter.emit(BillingEvents.CREATE, {
+            amountDue: highestBid.bidAmount,
+            biddingHistory: user,
+          });
           console.log('Send congratulatory email to: ', user.user.username);
         } else {
           console.log(

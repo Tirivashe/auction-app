@@ -13,7 +13,7 @@ export class Bill extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Item' })
   item: Item;
 
-  @Prop()
+  @Prop({ default: 0, type: 'number' })
   amountDue: number;
 }
 

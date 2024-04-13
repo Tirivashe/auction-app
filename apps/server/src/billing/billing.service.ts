@@ -13,11 +13,17 @@ export class BillingService {
   ) {}
 
   @OnEvent(BillingEvents.CREATE, { async: true })
-  async generateBill(biddingHistory: BiddingHistory) {
+  async generateBill({
+    amountDue,
+    biddingHistory,
+  }: {
+    amountDue: number;
+    biddingHistory: BiddingHistory;
+  }) {
     await this.billingModel.create({
       user: biddingHistory.user,
       item: biddingHistory.item,
-      amountDue: biddingHistory.item.awardedFor,
+      amountDue,
     });
 
     console.log('Bill created');
@@ -27,9 +33,9 @@ export class BillingService {
     return await this.billingModel.find().populate(['user', 'item']);
   }
 
-  async getBillById(userId: string): Promise<Bill> {
+  async getBillById(userId: string): Promise<Bill[]> {
     return await this.billingModel
-      .findOne({ user: userId })
+      .find({ user: userId })
       .populate(['user', 'item']);
   }
 }
