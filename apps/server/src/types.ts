@@ -1,7 +1,7 @@
 export enum Status {
-  Won = 'won',
-  Lost = 'lost',
-  InProgress = 'in_progress',
+  Won = 'Won',
+  Lost = 'Lost',
+  InProgress = 'In Progress',
 }
 
 export enum Role {
