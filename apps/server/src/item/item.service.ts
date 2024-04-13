@@ -97,18 +97,28 @@ export class ItemService {
   @OnEvent(BidEvents.CLOSED)
   async awardItemToHighestBidder(itemId: string) {
     const highestBid = await this.getHighestBidForItem(itemId);
-    if (!highestBid) {
-      this.eventEmitter.emit(ItemEvents.ITEM_NOT_AWARDED);
-      return;
-    }
     const item = await this.itemModel.findById(itemId);
     if (!item) return;
-    item.winner = highestBid.user._id;
-    item.awardedFor = highestBid.bidAmount;
-    item.isActive = false;
-    await item.save();
+    if (highestBid) {
+      const usersBiddingOnItem = await this.getUsersBiddingOnItem(
+        highestBid.item._id.toString(),
+      );
+      for (const user of usersBiddingOnItem) {
+        if (user.user._id.toString() === highestBid.user._id.toString()) {
+          user.bidStatus = Status.Won;
+        } else {
+          user.bidStatus = Status.Lost;
+        }
+        user.autobid = false;
+        await user.save();
+      }
+      item.winner = highestBid.user._id || null;
+      item.awardedFor = highestBid.bidAmount || 0;
+      item.isActive = false;
+      await item.save();
+    }
     console.log('Item awarded!!!');
-    this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, itemId);
+    this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, highestBid);
   }
 
   private async canPlaceBid(
@@ -137,6 +147,8 @@ export class ItemService {
         canBid: false,
         message: 'Place a bid higher than the current price',
       };
+    if (!itemToBidOn.isActive)
+      return { canBid: false, message: 'Bidding for this item has closed' };
     return { canBid: true, message: '' };
   }
 
@@ -148,6 +160,7 @@ export class ItemService {
           bidAmount: -1,
         })
         .limit(1)
+        .populate('user')
     )[0];
   }
 
@@ -182,5 +195,15 @@ export class ItemService {
       await existingBiddingHistory.save({ session });
     }
     await newBid.save({ session });
+  }
+
+  private async getUsersBiddingOnItem(
+    itemId: string,
+  ): Promise<BiddingHistory[]> {
+    return await this.biddingHistoryModel
+      .find({
+        item: itemId,
+      })
+      .populate('user');
   }
 }
