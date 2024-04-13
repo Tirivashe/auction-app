@@ -112,11 +112,11 @@ export class ItemService {
         user.autobid = false;
         await user.save();
       }
-      item.winner = highestBid.user._id || null;
-      item.awardedFor = highestBid.bidAmount || 0;
-      item.isActive = false;
-      await item.save();
     }
+    item.winner = highestBid.user._id || null;
+    item.awardedFor = highestBid.bidAmount || 0;
+    item.isActive = false;
+    await item.save();
     console.log('Item awarded!!!');
     this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, highestBid);
   }
