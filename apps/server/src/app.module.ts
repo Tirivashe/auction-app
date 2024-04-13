@@ -12,6 +12,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailerModule } from './emailer/emailer.module';
 import { ConfigModule } from '@nestjs/config';
+import { BillingModule } from './billing/billing.module';
 
 // TODO: Change the mongo connection string to mongo atlas later
 @Module({
@@ -29,6 +30,7 @@ import { ConfigModule } from '@nestjs/config';
     NotificationModule,
     SchedulerModule,
     EmailerModule,
+    BillingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
