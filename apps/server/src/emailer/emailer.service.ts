@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { SendEmailDto } from './email.interface';
 import Mail from 'nodemailer/lib/mailer';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ItemEvents } from 'src/item/events/item-events';
 import { BidEvents } from 'src/bid/events/bid-events';
 import { Bid } from 'src/bid/schema/bid.schema';
@@ -11,6 +11,7 @@ import { PlaceBidDto } from 'src/item/dto/place-bid.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Model } from 'mongoose';
+import { BillingEvents } from 'src/billing/events/billing.events';
 
 // ! TODO: Implement Real Email!!
 
@@ -20,6 +21,7 @@ export class EmailerService {
     @InjectModel(BiddingHistory.name)
     private readonly biddingHistoryModel: Model<BiddingHistory>,
     private readonly configService: ConfigService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @OnEvent(ItemEvents.ITEM_AWARDED, { async: true })
@@ -31,6 +33,7 @@ export class EmailerService {
 
       for (const user of usersBiddingOnItem) {
         if (user.user._id.toString() === highestBid.user._id.toString()) {
+          this.eventEmitter.emit(BillingEvents.CREATE, user);
           console.log('Send congratulatory email to: ', user.user.username);
         } else {
           console.log(
