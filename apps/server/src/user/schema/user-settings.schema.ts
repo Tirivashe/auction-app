@@ -4,7 +4,7 @@ import { User } from './user.schema';
 
 export type UserSettingsDocument = HydratedDocument<UserSettings>;
 
-@Schema()
+@Schema({ collection: 'autobidoptions' })
 export class UserSettings {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

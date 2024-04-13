@@ -10,10 +10,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './notification/notification.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailerModule } from './emailer/emailer.module';
+import { ConfigModule } from '@nestjs/config';
 
 // TODO: Change the mongo connection string to mongo atlas later
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     MongooseModule.forRoot(
@@ -25,6 +28,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     BidModule,
     NotificationModule,
     SchedulerModule,
+    EmailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
