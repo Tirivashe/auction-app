@@ -1,7 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { BillingService } from './billing.service';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('billing')
+@UseGuards(JwtGuard)
 export class BillingController {
   constructor(private readonly billingService: BillingService) {}
 

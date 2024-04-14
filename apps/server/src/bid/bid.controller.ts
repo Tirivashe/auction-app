@@ -1,7 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { BidService } from './bid.service';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller()
+@UseGuards(JwtGuard)
 export class BidController {
   constructor(private readonly bidService: BidService) {}
 

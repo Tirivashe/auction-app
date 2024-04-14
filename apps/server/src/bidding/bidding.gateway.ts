@@ -9,12 +9,15 @@ import {
 import { BiddingService } from './bidding.service';
 import { CreateBiddingDto } from './dto/create-bidding.dto';
 import { Server, Socket } from 'socket.io';
+import { UseGuards } from '@nestjs/common';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
+@UseGuards(JwtGuard)
 export class BiddingGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {

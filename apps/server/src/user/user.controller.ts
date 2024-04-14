@@ -1,9 +1,11 @@
-import { Controller, Get, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ToggleAutobidDto } from 'src/item/dto/toggle-autobid.dto';
 import { UserSettingsDto } from './dto/user-settings.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('user')
+@UseGuards(JwtGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
