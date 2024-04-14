@@ -25,6 +25,11 @@ export class ItemController {
     return await this.itemService.getAllItems(queryParams);
   }
 
+  @Get('items/:id')
+  async getItemById(@Param('id') id: string) {
+    return await this.itemService.getItemById(id);
+  }
+
   @Post('item')
   @HttpCode(HttpStatus.CREATED)
   async createItem(@Body() createItemDto: CreateItemDto) {

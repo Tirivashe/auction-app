@@ -44,6 +44,10 @@ export class ItemService {
     return items;
   }
 
+  async getItemById(itemId: string): Promise<Item> {
+    return await this.itemModel.findOne({ _id: itemId }).populate('winner');
+  }
+
   async createItem(createItemDto: CreateItemDto) {
     const { expiresAt, ...rest } = createItemDto;
     const date = new Date(expiresAt);
