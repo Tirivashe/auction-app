@@ -1,11 +1,11 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Item } from './schema/item.schema';
-import { ClientSession, Connection, Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
-import { PlaceBidDto } from './dto/place-bid.dto';
+// import { PlaceBidDto } from './dto/place-bid.dto';
 import { Bid } from 'src/bid/schema/bid.schema';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Status } from 'src/types';
@@ -59,30 +59,30 @@ export class ItemService {
     return { message: 'Item created', status: HttpStatus.CREATED };
   }
 
-  async placeBid(itemId: string, placeBidDto: PlaceBidDto) {
-    const allBidsForItem = await this.bidModel.find({ item: itemId });
-    const { canBid, message } = await this.canPlaceBid(
-      itemId,
-      allBidsForItem,
-      placeBidDto,
-    );
-    if (!canBid) throw new BadRequestException(message);
-    const session = await this.connection.startSession();
-    session.startTransaction();
-    try {
-      await this.createBid(itemId, placeBidDto, session);
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-    } finally {
-      session.endSession();
-    }
-    this.eventEmitter.emit(BidEvents.CREATED, {
-      itemId,
-      placeBidDto,
-    });
-    return { message: 'Bid created', status: HttpStatus.CREATED };
-  }
+  // async placeBid(itemId: string, placeBidDto: PlaceBidDto) {
+  //   const allBidsForItem = await this.bidModel.find({ item: itemId });
+  //   const { canBid, message } = await this.canPlaceBid(
+  //     itemId,
+  //     allBidsForItem,
+  //     placeBidDto,
+  //   );
+  //   if (!canBid) throw new BadRequestException(message);
+  //   const session = await this.connection.startSession();
+  //   session.startTransaction();
+  //   try {
+  //     await this.createBid(itemId, placeBidDto, session);
+  //     await session.commitTransaction();
+  //   } catch (error) {
+  //     await session.abortTransaction();
+  //   } finally {
+  //     session.endSession();
+  //   }
+  //   this.eventEmitter.emit(BidEvents.CREATED, {
+  //     itemId,
+  //     placeBidDto,
+  //   });
+  //   return { message: 'Bid created', status: HttpStatus.CREATED };
+  // }
 
   async updateItem(updateItemDto: UpdateItemDto, id: string) {
     const updatedItem = await this.itemModel.updateOne(
@@ -125,36 +125,36 @@ export class ItemService {
     this.eventEmitter.emit(ItemEvents.ITEM_AWARDED, highestBid);
   }
 
-  private async canPlaceBid(
-    itemId: string,
-    allBidsForItem: Bid[],
-    placeBidDto: PlaceBidDto,
-  ) {
-    if (allBidsForItem.length > 0) {
-      const highestBid = await this.getHighestBidForItem(itemId);
-      if (highestBid.user._id.toString() === placeBidDto.userId) {
-        return {
-          canBid: false,
-          message: 'You are currently the highest bidder on this item',
-        };
-      }
-      if (highestBid.bidAmount >= placeBidDto.amount) {
-        return {
-          canBid: false,
-          message: 'Place a bid higher than the current highest bid amount',
-        };
-      }
-    }
-    const itemToBidOn: Item = await this.itemModel.findById(itemId);
-    if (itemToBidOn.price >= placeBidDto.amount)
-      return {
-        canBid: false,
-        message: 'Place a bid higher than the current price',
-      };
-    if (!itemToBidOn.isActive)
-      return { canBid: false, message: 'Bidding for this item has closed' };
-    return { canBid: true, message: '' };
-  }
+  // private async canPlaceBid(
+  //   itemId: string,
+  //   allBidsForItem: Bid[],
+  //   placeBidDto: PlaceBidDto,
+  // ) {
+  //   if (allBidsForItem.length > 0) {
+  //     const highestBid = await this.getHighestBidForItem(itemId);
+  //     if (highestBid.user._id.toString() === placeBidDto.userId) {
+  //       return {
+  //         canBid: false,
+  //         message: 'You are currently the highest bidder on this item',
+  //       };
+  //     }
+  //     if (highestBid.bidAmount >= placeBidDto.amount) {
+  //       return {
+  //         canBid: false,
+  //         message: 'Place a bid higher than the current highest bid amount',
+  //       };
+  //     }
+  //   }
+  //   const itemToBidOn: Item = await this.itemModel.findById(itemId);
+  //   if (itemToBidOn.price >= placeBidDto.amount)
+  //     return {
+  //       canBid: false,
+  //       message: 'Place a bid higher than the current price',
+  //     };
+  //   if (!itemToBidOn.isActive)
+  //     return { canBid: false, message: 'Bidding for this item has closed' };
+  //   return { canBid: true, message: '' };
+  // }
 
   private async getHighestBidForItem(itemId: string): Promise<Bid> {
     return (
@@ -169,37 +169,37 @@ export class ItemService {
   }
 
   // TODO: Lower the lines of code down to 30
-  async createBid(
-    itemId: string,
-    placeBidDto: PlaceBidDto,
-    session: ClientSession,
-  ) {
-    const existingBiddingHistory = await this.biddingHistoryModel.findOne({
-      item: itemId,
-      user: placeBidDto.userId,
-    });
-    const newBid: Bid = new this.bidModel({
-      $session: session,
-      item: itemId,
-      bidAmount: placeBidDto.amount,
-      user: placeBidDto.userId,
-    });
-    if (!existingBiddingHistory) {
-      const newBiddingHistory: BiddingHistory = new this.biddingHistoryModel({
-        bid: newBid._id,
-        user: placeBidDto.userId,
-        item: itemId,
-        bidStatus: Status.InProgress,
-        autobid: placeBidDto.autobid || false,
-      });
-      newBiddingHistory.bids.push(newBid);
-      await newBiddingHistory.save({ session });
-    } else {
-      existingBiddingHistory.bids.push(newBid);
-      await existingBiddingHistory.save({ session });
-    }
-    await newBid.save({ session });
-  }
+  // async createBid(
+  //   itemId: string,
+  //   placeBidDto: PlaceBidDto,
+  //   session: ClientSession,
+  // ) {
+  //   const existingBiddingHistory = await this.biddingHistoryModel.findOne({
+  //     item: itemId,
+  //     user: placeBidDto.userId,
+  //   });
+  //   const newBid: Bid = new this.bidModel({
+  //     $session: session,
+  //     item: itemId,
+  //     bidAmount: placeBidDto.amount,
+  //     user: placeBidDto.userId,
+  //   });
+  //   if (!existingBiddingHistory) {
+  //     const newBiddingHistory: BiddingHistory = new this.biddingHistoryModel({
+  //       bid: newBid._id,
+  //       user: placeBidDto.userId,
+  //       item: itemId,
+  //       bidStatus: Status.InProgress,
+  //       autobid: placeBidDto.autobid || false,
+  //     });
+  //     newBiddingHistory.bids.push(newBid);
+  //     await newBiddingHistory.save({ session });
+  //   } else {
+  //     existingBiddingHistory.bids.push(newBid);
+  //     await existingBiddingHistory.save({ session });
+  //   }
+  //   await newBid.save({ session });
+  // }
 
   private async getUsersBiddingOnItem(
     itemId: string,
