@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBiddingDto } from './dto/create-bidding.dto';
-import { UpdateBiddingDto } from './dto/update-bidding.dto';
+// import { UpdateBiddingDto } from './dto/update-bidding.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Bid } from 'src/bid/schema/bid.schema';
 import { ClientSession, Connection, Model } from 'mongoose';
@@ -9,6 +9,7 @@ import { BidEvents } from 'src/bid/events/bid-events';
 import { Status } from 'src/types';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Item } from 'src/item/schema/item.schema';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class BiddingService {
@@ -20,7 +21,9 @@ export class BiddingService {
     @InjectConnection() private readonly connection: Connection,
     private readonly eventEmitter: EventEmitter2,
   ) {}
-  async create(createBiddingDto: CreateBiddingDto) {
+
+  // TODO: Make this run concurrently correctly
+  async onCreateBid(createBiddingDto: CreateBiddingDto, server: Server) {
     const allBidsForItem = await this.bidModel.find({
       item: createBiddingDto.itemId,
     });
@@ -40,6 +43,7 @@ export class BiddingService {
       session.endSession();
     }
     this.eventEmitter.emit(BidEvents.CREATED, createBiddingDto);
+    server.emit('bid.created');
     return { message: 'Bid created', status: HttpStatus.CREATED };
   }
 
@@ -49,14 +53,6 @@ export class BiddingService {
 
   findOne(id: number) {
     return `This action returns a #${id} bidding`;
-  }
-
-  update(id: number, updateBiddingDto: UpdateBiddingDto) {
-    return `This action updates a #${id} bidding`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} bidding`;
   }
 
   async createBid(createBiddingDto: CreateBiddingDto, session: ClientSession) {
