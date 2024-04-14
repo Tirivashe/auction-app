@@ -53,15 +53,4 @@ export class AuthService {
       throw new InternalServerErrorException('Something went wrong');
     }
   }
-
-  // async signUpAndLogin(userCredentials: CreateUserDto) {
-  //   const existingUser = await this.userService.findOne(userCredentials.email);
-  //   if (!!existingUser) {
-  //     console.log(existingUser);
-  //     throw new BadRequestException('User with this email already exists');
-  //   }
-  //   const { id, username, email } =
-  //     await this.userService.create(userCredentials);
-  //   return { id, username, email };
-  // }
 }
