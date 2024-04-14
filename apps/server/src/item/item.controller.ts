@@ -15,7 +15,6 @@ import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
-// import { PlaceBidDto } from './dto/place-bid.dto';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { Role } from 'src/types';
