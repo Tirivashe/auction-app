@@ -7,11 +7,11 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ItemEvents } from 'src/item/events/item-events';
 import { BidEvents } from 'src/bid/events/bid-events';
 import { Bid } from 'src/bid/schema/bid.schema';
-import { PlaceBidDto } from 'src/item/dto/place-bid.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Model } from 'mongoose';
 import { BillingEvents } from 'src/billing/events/billing.events';
+import { CreateBiddingDto } from 'src/bidding/dto/create-bidding.dto';
 
 // ! TODO: Implement Real Email!!
 
@@ -63,16 +63,12 @@ export class EmailerService {
   }
 
   @OnEvent(BidEvents.CREATED, { async: true })
-  async onBidCreatedOnItem({
-    itemId,
-    placeBidDto,
-  }: {
-    itemId: string;
-    placeBidDto: PlaceBidDto;
-  }) {
-    const usersBiddingOnItem = await this.getUsersBiddingOnItem(itemId);
+  async onBidCreatedOnItem(createBiddingDto: CreateBiddingDto) {
+    const usersBiddingOnItem = await this.getUsersBiddingOnItem(
+      createBiddingDto.itemId,
+    );
     for (const user of usersBiddingOnItem) {
-      if (user.user._id.toString() === placeBidDto.userId) continue;
+      if (user.user._id.toString() === createBiddingDto.userId) continue;
       console.log(
         'Send email to:',
         user.user.username,
