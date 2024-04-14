@@ -15,9 +15,6 @@ export class Bid extends Document {
 
   @Prop()
   bidAmount: number;
-
-  // @Prop({ default: Date.now, required: true })
-  // bidTime: Date;
 }
 
 export const BidSchema = SchemaFactory.createForClass(Bid);

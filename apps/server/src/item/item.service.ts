@@ -5,7 +5,6 @@ import { Item } from './schema/item.schema';
 import { Connection, Model } from 'mongoose';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
-// import { PlaceBidDto } from './dto/place-bid.dto';
 import { Bid } from 'src/bid/schema/bid.schema';
 import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Status } from 'src/types';
