@@ -44,12 +44,6 @@ export class ItemController {
     return await this.itemService.createItem(createItemDto);
   }
 
-  // @Post('item/:id/bid')
-  // @HttpCode(HttpStatus.CREATED)
-  // async placeBid(@Body() placeBid: PlaceBidDto, @Param('id') itemId: string) {
-  //   return await this.itemService.placeBid(itemId, placeBid);
-  // }
-
   @Patch('item/:id')
   @Roles(Role.Admin)
   @HttpCode(HttpStatus.OK)
