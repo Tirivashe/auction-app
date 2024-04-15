@@ -18,7 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<{ token: string }> {
+  async signUp(signUpDto: SignUpDto): Promise<{ token: string; user: User }> {
     const { email, password, username, role } = signUpDto;
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -28,15 +28,16 @@ export class AuthService {
         username,
         role,
       });
+      const createdUser = user.set('password', undefined, { strict: false });
       const token = this.jwtService.sign({ id: user._id });
 
-      return { token };
+      return { token, user: createdUser };
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string }> {
+  async login(loginDto: LoginDto): Promise<{ token: string; user: User }> {
     const { email, password } = loginDto;
     try {
       const user = await this.userModel.findOne({ email });
@@ -47,8 +48,10 @@ export class AuthService {
       if (!isPasswordMatched) {
         throw new UnauthorizedException('Invalid credentials');
       }
+      const loggedUser = user.set('password', undefined, { strict: false });
       const token = this.jwtService.sign({ id: user._id });
-      return { token };
+
+      return { token, user: loggedUser };
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }
