@@ -1,13 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, HydratedDocument } from 'mongoose';
 import { UserSettings } from './user-settings.schema';
+import { Role } from 'src/types';
 
 export type UserDocument = HydratedDocument<User>;
 
-enum Role {
-  Admin = 'Admin',
-  Regular = 'Regular',
-}
 @Schema()
 export class User extends Document {
   @Prop({ required: true })
@@ -19,7 +16,7 @@ export class User extends Document {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ enum: ['Admin', 'Regular'], required: true, default: Role.Regular })
+  @Prop({ enum: ['ADMIN', 'REGULAR'], required: true, default: Role.Regular })
   role: Role;
 
   @Prop({
