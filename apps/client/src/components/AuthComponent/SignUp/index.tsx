@@ -13,8 +13,16 @@ import styles from "./Signup.module.css";
 import { useForm, zodResolver } from "@mantine/form";
 import { schema } from "./validationSchema";
 import { useMutation } from "@tanstack/react-query";
-import { AuthForm, Role, SignUpDto } from "../../../types";
+import {
+  AuthForm,
+  Role,
+  ServerAuthSuccessResponse,
+  ServerError,
+  SignUpDto,
+} from "../../../types";
+import { useAuthStore } from "../../../store";
 import { signUp } from "../../../api/mutations";
+import { useEffect } from "react";
 
 type SignUpFormValues = {
   username: string;
@@ -28,6 +36,7 @@ type Props = {
 };
 
 export function SignUp({ changeForm }: Props) {
+  const setAuth = useAuthStore((state) => state.setAuthResponse);
   const form = useForm<SignUpFormValues>({
     mode: "uncontrolled",
     initialValues: {
@@ -39,7 +48,12 @@ export function SignUp({ changeForm }: Props) {
     validate: zodResolver(schema),
   });
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, isError, error, data } = useMutation<
+    ServerAuthSuccessResponse | ServerError,
+    ServerError,
+    SignUpDto,
+    unknown
+  >({
     mutationFn: (signUpDto: SignUpDto) => signUp(signUpDto),
   });
 
@@ -50,6 +64,19 @@ export function SignUp({ changeForm }: Props) {
     };
     mutate(body);
   };
+
+  useEffect(() => {
+    if (isError) {
+      form.setErrors({ password: error.message });
+    }
+    if (typeof data === "object" && "error" in data) {
+      form.setErrors({ password: data.message });
+    }
+
+    if (typeof data === "object" && "token" in data) {
+      setAuth(data);
+    }
+  }, [error?.message, isError, form, data, setAuth]);
 
   return (
     <Container size={520} w="100%">

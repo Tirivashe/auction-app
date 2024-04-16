@@ -20,6 +20,7 @@ import {
 } from "../../../types";
 import { login } from "../../../api/mutations";
 import { useEffect } from "react";
+import { useAuthStore } from "../../../store";
 
 type LoginFormValues = {
   email: string;
@@ -31,6 +32,7 @@ type Props = {
 };
 
 export function Login({ changeForm }: Props) {
+  const setAuth = useAuthStore((state) => state.setAuthResponse);
   const form = useForm<LoginFormValues>({
     mode: "uncontrolled",
     initialValues: {
@@ -40,7 +42,7 @@ export function Login({ changeForm }: Props) {
     validate: zodResolver(schema),
   });
 
-  const { mutate, isPending, isSuccess, isError, error, data } = useMutation<
+  const { mutate, isPending, isError, error, data } = useMutation<
     ServerAuthSuccessResponse | ServerError,
     ServerError,
     LoginDto,
@@ -63,7 +65,11 @@ export function Login({ changeForm }: Props) {
     if (typeof data === "object" && "error" in data) {
       form.setErrors({ password: data.message });
     }
-  }, [error?.message, isError, form, data]);
+
+    if (typeof data === "object" && "token" in data) {
+      setAuth(data);
+    }
+  }, [error?.message, isError, form, data, setAuth]);
 
   return (
     <Container size={520} w="100%">
@@ -115,7 +121,6 @@ export function Login({ changeForm }: Props) {
           Sign up
         </Button>
       </Paper>
-      {isSuccess && JSON.stringify(data)}
     </Container>
   );
 }
