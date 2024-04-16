@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { SignUp } from "./SignUp";
 import { Login } from "./Login";
+import { AuthForm } from "../../types";
 
-export enum AuthForm {
-  SIGNUP = "SIGNUP",
-  LOGIN = "LOGIN",
-}
 const AuthComponent = () => {
   const [authForm, setAuthForm] = useState<AuthForm>(AuthForm.SIGNUP);
   const changeAuthForm = (form: AuthForm) => setAuthForm(form);

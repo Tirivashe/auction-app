@@ -28,6 +28,11 @@ export type ServerError = {
   error: string;
 };
 
+export enum AuthForm {
+  SIGNUP = "SIGNUP",
+  LOGIN = "LOGIN",
+}
+
 export type ServerAuthSuccessResponse = { token: string; user: User };
 
 export type ServerAuthResponse = ServerAuthSuccessResponse | ServerError;
