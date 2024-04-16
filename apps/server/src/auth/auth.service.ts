@@ -53,7 +53,11 @@ export class AuthService {
 
       return { token, user: loggedUser };
     } catch (error) {
-      throw new InternalServerErrorException('Something went wrong');
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Something went wrong');
+      }
     }
   }
 }
