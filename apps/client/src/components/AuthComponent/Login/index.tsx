@@ -13,13 +13,13 @@ import { useForm, zodResolver } from "@mantine/form";
 import { schema } from "./validationSchema";
 import { useMutation } from "@tanstack/react-query";
 import {
+  AuthForm,
   LoginDto,
   ServerAuthSuccessResponse,
   ServerError,
 } from "../../../types";
 import { login } from "../../../api/mutations";
 import { useEffect } from "react";
-import { AuthForm } from "..";
 
 type LoginFormValues = {
   email: string;

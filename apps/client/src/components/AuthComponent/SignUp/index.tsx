@@ -13,9 +13,8 @@ import styles from "./Signup.module.css";
 import { useForm, zodResolver } from "@mantine/form";
 import { schema } from "./validationSchema";
 import { useMutation } from "@tanstack/react-query";
-import { Role, SignUpDto } from "../../../types";
+import { AuthForm, Role, SignUpDto } from "../../../types";
 import { signUp } from "../../../api/mutations";
-import { AuthForm } from "..";
 
 type SignUpFormValues = {
   username: string;
