@@ -21,6 +21,8 @@ import {
 import { login } from "../../../api/mutations";
 import { useEffect } from "react";
 import { useAuthStore } from "../../../store";
+import { useNavigate } from "react-router-dom";
+import { navigateUserOnAuth } from "../../../utils";
 
 type LoginFormValues = {
   email: string;
@@ -33,6 +35,8 @@ type Props = {
 
 export function Login({ changeForm }: Props) {
   const setAuth = useAuthStore((state) => state.setAuthResponse);
+  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
   const form = useForm<LoginFormValues>({
     mode: "uncontrolled",
     initialValues: {
@@ -70,6 +74,13 @@ export function Login({ changeForm }: Props) {
       setAuth(data);
     }
   }, [error?.message, isError, form, data, setAuth]);
+
+  useEffect(() => {
+    if (user === null) {
+      return;
+    }
+    navigateUserOnAuth(user, navigate);
+  }, [user, navigate]);
 
   return (
     <Container size={520} w="100%">
@@ -118,7 +129,7 @@ export function Login({ changeForm }: Props) {
           loading={isPending}
           disabled={isPending}
         >
-          Sign up
+          Log in
         </Button>
       </Paper>
     </Container>

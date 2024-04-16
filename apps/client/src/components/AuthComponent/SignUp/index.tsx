@@ -23,6 +23,8 @@ import {
 import { useAuthStore } from "../../../store";
 import { signUp } from "../../../api/mutations";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { navigateUserOnAuth } from "../../../utils";
 
 type SignUpFormValues = {
   username: string;
@@ -37,6 +39,8 @@ type Props = {
 
 export function SignUp({ changeForm }: Props) {
   const setAuth = useAuthStore((state) => state.setAuthResponse);
+  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
   const form = useForm<SignUpFormValues>({
     mode: "uncontrolled",
     initialValues: {
@@ -77,6 +81,13 @@ export function SignUp({ changeForm }: Props) {
       setAuth(data);
     }
   }, [error?.message, isError, form, data, setAuth]);
+
+  useEffect(() => {
+    if (user === null) {
+      return;
+    }
+    navigateUserOnAuth(user, navigate);
+  }, [user, navigate]);
 
   return (
     <Container size={520} w="100%">
