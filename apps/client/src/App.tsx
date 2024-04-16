@@ -1,15 +1,39 @@
 import AuthPage from "./pages/Auth";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import { Center } from "@mantine/core";
+import HomePage from "./pages/Home";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import ItemDetailsPage from "./pages/ItemDetails";
+import DashboardPage from "./pages/Dashboard";
+import ProfilePage from "./pages/Profile";
+import AdminOnlyRoute from "./components/AdminOnlyRoute";
 
-// type Props = {};
+const router = createBrowserRouter([
+  {
+    path: "/auth",
+    element: <AuthPage />,
+  },
+  {
+    path: "/",
+    element: <ProtectedRoutes />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: "items", element: <ItemDetailsPage /> },
+      {
+        path: "dashboard",
+        element: (
+          <AdminOnlyRoute>
+            <DashboardPage />
+          </AdminOnlyRoute>
+        ),
+      },
+      { path: "profile", element: <ProfilePage /> },
+    ],
+  },
+]);
 
 const App = () => {
-  return (
-    <Center h="100vh">
-      <AuthPage />;
-    </Center>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

@@ -1,7 +1,7 @@
 import { useAuthStore } from "../../store";
 import { Navigate, Outlet } from "react-router-dom";
 
-const ProtectedRoute = () => {
+const ProtectedRoutes = () => {
   const token = useAuthStore((state) => state.token);
 
   if (token === null) {
@@ -10,4 +10,4 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default ProtectedRoutes;
