@@ -36,3 +36,16 @@ export enum AuthForm {
 export type ServerAuthSuccessResponse = { token: string; user: User };
 
 export type ServerAuthResponse = ServerAuthSuccessResponse | ServerError;
+
+export type AuctionItem = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  expiresAt: Date;
+  isActive: boolean;
+  winner: User;
+  awardedFor: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
