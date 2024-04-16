@@ -1,17 +1,13 @@
-@layer mantine, login;
+.title {
+  font-family:
+    Greycliff CF,
+    var(--mantine-font-family);
+  font-weight: 900 !important;
+}
 
-@layer login {
-  .title {
-    font-family:
-      Greycliff CF,
-      var(--mantine-font-family);
-    font-weight: 900;
-  }
-
-  .form {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 15px;
-  }
+.form {
+  display: flex !important;
+  width: 100%;
+  flex-direction: column;
+  gap: 15px;
 }

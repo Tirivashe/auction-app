@@ -66,7 +66,7 @@ export function Login({ changeForm }: Props) {
   }, [error?.message, isError, form, data]);
 
   return (
-    <Container size={420} my={40}>
+    <Container size={520} w="100%">
       <Title ta="center" className={styles.title}>
         Welcome Back!
       </Title>

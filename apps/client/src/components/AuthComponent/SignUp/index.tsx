@@ -53,7 +53,7 @@ export function SignUp({ changeForm }: Props) {
   };
 
   return (
-    <Container size={420} my={40}>
+    <Container size={520} w="100%">
       <Title ta="center" className={styles.title}>
         Welcome to Auctioneer!
       </Title>
