@@ -12,19 +12,12 @@ import {
 import styles from "./Signup.module.css";
 import { useForm, zodResolver } from "@mantine/form";
 import { schema } from "./validationSchema";
-import { useMutation } from "@tanstack/react-query";
-import {
-  AuthForm,
-  Role,
-  ServerAuthSuccessResponse,
-  ServerError,
-  SignUpDto,
-} from "../../../types";
+import { AuthForm, Role, SignUpDto } from "../../../types";
 import { useAuthStore } from "../../../store";
-import { signUp } from "../../../api/mutations";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { navigateUserOnAuth } from "../../../utils";
+import { useSignUp } from "../../../hooks/useSignUp";
 
 type SignUpFormValues = {
   username: string;
@@ -52,15 +45,7 @@ export function SignUp({ changeForm }: Props) {
     validate: zodResolver(schema),
   });
 
-  const { mutate, isPending, isError, error, data } = useMutation<
-    ServerAuthSuccessResponse | ServerError,
-    ServerError,
-    SignUpDto,
-    unknown
-  >({
-    mutationFn: (signUpDto: SignUpDto) => signUp(signUpDto),
-  });
-
+  const { mutate, isPending, isError, error, data } = useSignUp();
   const handleSubmit = (values: SignUpFormValues) => {
     const body: SignUpDto = {
       ...values,

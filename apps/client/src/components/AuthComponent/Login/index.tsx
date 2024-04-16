@@ -11,18 +11,12 @@ import {
 import styles from "./Login.module.css";
 import { useForm, zodResolver } from "@mantine/form";
 import { schema } from "./validationSchema";
-import { useMutation } from "@tanstack/react-query";
-import {
-  AuthForm,
-  LoginDto,
-  ServerAuthSuccessResponse,
-  ServerError,
-} from "../../../types";
-import { login } from "../../../api/mutations";
+import { AuthForm, LoginDto } from "../../../types";
 import { useEffect } from "react";
 import { useAuthStore } from "../../../store";
 import { useNavigate } from "react-router-dom";
 import { navigateUserOnAuth } from "../../../utils";
+import { useLogin } from "../../../hooks/useLogin";
 
 type LoginFormValues = {
   email: string;
@@ -46,14 +40,7 @@ export function Login({ changeForm }: Props) {
     validate: zodResolver(schema),
   });
 
-  const { mutate, isPending, isError, error, data } = useMutation<
-    ServerAuthSuccessResponse | ServerError,
-    ServerError,
-    LoginDto,
-    unknown
-  >({
-    mutationFn: (loginDto: LoginDto) => login(loginDto),
-  });
+  const { mutate, isPending, isError, error, data } = useLogin();
 
   const handleSubmit = (values: LoginFormValues) => {
     const body: LoginDto = {
