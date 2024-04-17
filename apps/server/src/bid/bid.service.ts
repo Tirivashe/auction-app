@@ -25,7 +25,10 @@ export class BidService {
   }
 
   async getBidsByItemId(itemId: string): Promise<Bid[]> {
-    return await this.bidModel.find({ item: itemId }).populate('item');
+    return await this.bidModel
+      .find({ item: itemId })
+      .populate('item')
+      .populate('user');
   }
 
   // @OnEvent(BidEvents.AUTO_BID_CREATED, { async: true })
