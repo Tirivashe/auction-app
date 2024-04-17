@@ -1,11 +1,4 @@
-import {
-  IsDateString,
-  IsMimeType,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateItemDto {
   @IsString()
@@ -20,11 +13,11 @@ export class CreateItemDto {
   @IsNotEmpty()
   price: number;
 
-  @IsMimeType()
+  @IsString()
   @IsOptional()
   image?: string;
 
-  @IsDateString()
+  @IsString()
   @IsNotEmpty()
   expiresAt: Date;
 }

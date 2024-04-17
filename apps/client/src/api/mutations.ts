@@ -1,5 +1,12 @@
-import { LoginDto, ServerAuthResponse, SignUpDto } from "../types";
+import {
+  AuthorItemResponse,
+  LoginDto,
+  ServerAuthResponse,
+  SignUpDto,
+  UpdateItemDto,
+} from "../types";
 import axios, { type AxiosResponse } from "axios";
+import { axiosInstance } from "./constants";
 
 export const signUp = async (body: SignUpDto) => {
   const res: AxiosResponse<ServerAuthResponse> = await axios.post(
@@ -14,5 +21,25 @@ export const login = async (body: LoginDto) => {
     "/api/auth/login",
     body
   );
+  return res.data;
+};
+
+export const deleteItem = async (id: string) => {
+  await axiosInstance.delete(`/api/item/${id}`);
+};
+
+export const createItem = async (createItemDto: UpdateItemDto) => {
+  const res: AxiosResponse<AuthorItemResponse> = await axiosInstance.post(
+    "/api/item",
+    createItemDto
+  );
+  return res.data;
+};
+
+export const updateItem = async (
+  itemId: string,
+  updateItemDto: UpdateItemDto
+) => {
+  const res = await axiosInstance.patch(`/api/item/${itemId}`, updateItemDto);
   return res.data;
 };

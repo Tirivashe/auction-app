@@ -15,6 +15,16 @@ export type LoginDto = {
   password: string;
 };
 
+export type CreateItemDto = {
+  name: string;
+  description: string;
+  price: number;
+  image: File;
+  expiresAt: Date;
+};
+
+export type UpdateItemDto = Partial<CreateItemDto> & { isActive?: boolean };
+
 export type User = {
   username: string;
   email: string;
@@ -36,6 +46,10 @@ export enum AuthForm {
 export type ServerAuthSuccessResponse = { token: string; user: User };
 
 export type ServerAuthResponse = ServerAuthSuccessResponse | ServerError;
+
+export type AuthorItemResponse =
+  | { message: string; statusCode: number }
+  | ServerError;
 
 export type AuctionItem = {
   _id: string;
