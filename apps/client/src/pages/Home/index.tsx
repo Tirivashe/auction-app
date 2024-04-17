@@ -17,7 +17,7 @@ import ItemList from "../../components/ItemList";
 
 const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
   const filter = searchParams.get("filter");
   const order = searchParams.get("order") as "DESC" | "ASC" | null;
@@ -28,6 +28,13 @@ const HomePage = () => {
     page,
     limit: 10,
   });
+
+  const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set("filter", e.target.value);
+      return prev;
+    });
+  };
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["auctionItems", page] });
@@ -60,7 +67,12 @@ const HomePage = () => {
   return (
     <Stack p="lg" gap="xl">
       <Flex gap="sm">
-        <TextInput flex={1} placeholder="Filter items" />
+        <TextInput
+          flex={1}
+          placeholder="Filter items"
+          onChange={handleFilter}
+          value={filter || ""}
+        />
         <Button>Filter</Button>
       </Flex>
       <ItemList items={data.items} />

@@ -24,19 +24,20 @@ export class ItemService {
   ) {}
   async getAllItems(queryParams: QueryParamsDto) {
     const { filter = '', order = 'DESC', page = 1, limit = 10 } = queryParams;
+    const filterParams = {
+      $or: [
+        { name: { $regex: filter, $options: 'i' } },
+        { description: { $regex: filter, $options: 'i' } },
+      ],
+    };
     const skip = limit * (page - 1);
     const items: Item[] = await this.itemModel
-      .find({
-        $or: [
-          { name: { $regex: filter, $options: 'i' } },
-          { description: { $regex: filter, $options: 'i' } },
-        ],
-      })
+      .find({ ...filterParams })
       .sort({ price: order === 'ASC' ? 'asc' : 'desc' })
       .limit(limit)
       .skip(skip)
       .populate('winner');
-    const total = await this.itemModel.countDocuments();
+    const total = await this.itemModel.countDocuments({ ...filterParams });
     const hasNext = total > skip + items.length;
     const hasPrevious = skip > 0;
     const totalPages = Math.ceil(total / limit);
