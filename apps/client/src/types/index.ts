@@ -70,3 +70,12 @@ export type ItemServerResponse = {
   hasPrevious: boolean;
   totalPages: number;
 };
+
+export type Bid = {
+  _id: string;
+  user: User;
+  item: AuctionItem;
+  bidAmount: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

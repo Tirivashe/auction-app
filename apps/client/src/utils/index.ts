@@ -1,6 +1,7 @@
 import { Role, UpdateItemDto, User } from "../types";
 import { NavigateFunction } from "react-router-dom";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 
 export function navigateUserOnAuth(user: User, navigate: NavigateFunction) {
   if (user.role === Role.ADMIN) {
@@ -26,4 +27,16 @@ export const modifyFormData = (data: UpdateItemDto) => {
         return [key, value];
       })
   );
+};
+
+export const getRemainingTime = (deadline: Date) => {
+  const now = new Date();
+  dayjs.extend(duration);
+  const remainingTime = dayjs.duration(dayjs(deadline).diff(now));
+  return {
+    days: remainingTime.days(),
+    hours: remainingTime.hours(),
+    minutes: remainingTime.minutes(),
+    seconds: remainingTime.seconds(),
+  };
 };
