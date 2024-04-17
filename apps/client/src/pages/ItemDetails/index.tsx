@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+// import { useFetchAuctionItems } from "../../hooks/useFetchAuctionItems";
 
 const ItemDetailsPage = () => {
+  const { id } = useParams();
+  // const { data: items, isError, isLoading } = useFetchAuctionItems();
   return (
     <div>
-      <h1>ItemDetailsPage</h1>
-      <Link to="/dashboard">Dashboard</Link>
+      <h1>ItemDetailsPage for item {id}</h1>
     </div>
   );
 };
