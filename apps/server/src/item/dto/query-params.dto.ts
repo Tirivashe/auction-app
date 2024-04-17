@@ -1,6 +1,5 @@
 export class QueryParamsDto {
-  name?: string;
-  description?: string;
+  filter?: string;
   order?: 'ASC' | 'DESC';
   page?: number;
   limit?: number;

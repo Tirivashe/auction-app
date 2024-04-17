@@ -28,27 +28,23 @@ import { AuctionItem } from "../../types";
 import { useDeleteItem } from "../../hooks/useDeleteItem";
 import { useQueryClient } from "@tanstack/react-query";
 import AuthorItemModal from "../AuthorItemModal";
+import { SetURLSearchParams } from "react-router-dom";
 
 type TableProps = {
   data: AuctionItem[];
+  setSearchParams: SetURLSearchParams;
+  searchParams: URLSearchParams;
 };
-
-// interface RowData {
-//   name: string;
-//   email: string;
-//   company: string;
-// }
-
 interface ThProps {
   children?: React.ReactNode;
-  reversed?: boolean;
+  order?: string | null;
   sorted?: boolean;
   onSort?: () => void;
 }
 
-function Th({ children, reversed, sorted, onSort }: ThProps) {
+function Th({ children, order, sorted, onSort }: ThProps) {
   const Icon = sorted
-    ? reversed
+    ? order === "ASC"
       ? IconChevronUp
       : IconChevronDown
     : IconSelector;
@@ -68,20 +64,16 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
   );
 }
 
-// function filterData() {}
-
-// function sortData() {}
-
-export function ItemTable({ data }: TableProps) {
+export function ItemTable({ data, searchParams, setSearchParams }: TableProps) {
   const queryClient = useQueryClient();
   const { isSuccess, mutate } = useDeleteItem();
+  const [sorted, setSorted] = useState(false);
   const [
     createModalOpened,
     { open: openCreateModal, close: closeCreateModal },
   ] = useDisclosure(false);
   const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
     useDisclosure(false);
-  const [search, setSearch] = useState("");
   const [itemId, setItemId] = useState("");
 
   const handleEdit = (id: string) => {
@@ -89,9 +81,20 @@ export function ItemTable({ data }: TableProps) {
     openEditModal();
   };
 
-  const setSorting = () => {};
+  const onSort = () => {
+    setSorted(true);
+    setSearchParams((prev) => {
+      prev.set("order", prev.get("order") === "DESC" ? "ASC" : "DESC");
+      return prev;
+    });
+  };
 
-  const handleSearchChange = () => {};
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set("filter", e.target.value);
+      return prev;
+    });
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -139,7 +142,7 @@ export function ItemTable({ data }: TableProps) {
             />
           }
           className={classes.wrapper}
-          value={search}
+          value={searchParams.get("filter") || ""}
           onChange={handleSearchChange}
         />
         <Button leftSection={<IconCirclePlus />} onClick={openCreateModal}>
@@ -159,9 +162,9 @@ export function ItemTable({ data }: TableProps) {
             <Table.Th>Active</Table.Th>
             <Table.Th>Deadline</Table.Th>
             <Th
-            // sorted={sortBy === "company"}
-            // reversed={reverseSortDirection}
-            // onSort={() => {} setSorting("company")}
+              onSort={onSort}
+              sorted={sorted}
+              order={searchParams.get("order")}
             >
               Price
             </Th>
@@ -173,7 +176,7 @@ export function ItemTable({ data }: TableProps) {
             rows
           ) : (
             <Table.Tr>
-              <Table.Td colSpan={Object.keys(data[0]).length}>
+              <Table.Td colSpan={6}>
                 <Text fw={500} ta="center">
                   Nothing found
                 </Text>

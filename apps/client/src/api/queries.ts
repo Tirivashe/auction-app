@@ -12,8 +12,13 @@ export const getBidsByItemId = (
   return fetch(`/api/bid/${itemId}`).then((res) => res.json());
 };
 
-export const getAllAuctionItems = async () => {
-  const res: AxiosResponse<AuctionItem[]> =
-    await axiosInstance.get("/api/items");
+export const getAllAuctionItems = async (
+  filter: string = "",
+  page: number = 1,
+  order: "DESC" | "ASC"
+) => {
+  const res: AxiosResponse<AuctionItem[]> = await axiosInstance.get(
+    `/api/items?filter=${filter}&order=${order}&page=${page}`
+  );
   return res.data;
 };

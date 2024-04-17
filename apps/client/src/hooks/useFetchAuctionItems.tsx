@@ -2,9 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllAuctionItems } from "../api/queries";
 import { AuctionItem, ServerError } from "../types";
 
-export const useFetchAuctionItems = () => {
+export const useFetchAuctionItems = ({
+  filter,
+  order,
+  page,
+}: {
+  filter: string | null;
+  order: "DESC" | "ASC" | null;
+  page: number | null;
+}) => {
   return useQuery<AuctionItem[] | ServerError, ServerError>({
     queryKey: ["auctionItems"],
-    queryFn: () => getAllAuctionItems(),
+    queryFn: () => getAllAuctionItems(filter || "", page || 1, order || "ASC"),
   });
 };
