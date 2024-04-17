@@ -12,11 +12,7 @@ const DashboardPage = () => {
   const filter = searchParams.get("filter");
   const order = searchParams.get("order") as "DESC" | "ASC" | null;
   const deferredFilter = useDebounce(filter, 500);
-  const {
-    data: items,
-    isError,
-    isLoading,
-  } = useFetchAuctionItems({
+  const { data, isError, isLoading } = useFetchAuctionItems({
     filter: deferredFilter,
     order,
     limit: 1000,
@@ -29,8 +25,8 @@ const DashboardPage = () => {
   if (isError) {
     return <h2>Something Went Wrong</h2>;
   }
-  if (typeof items === "object" && "error" in items) {
-    return <h2>{items.error}</h2>;
+  if (typeof data === "object" && "error" in data) {
+    return <h2>{data.error}</h2>;
   }
   if (isLoading) {
     return <h2>Loading...</h2>;
@@ -39,7 +35,7 @@ const DashboardPage = () => {
   return (
     <Container size="85%">
       <ItemTable
-        data={items || []}
+        data={data?.items || []}
         searchParams={searchParams}
         setSearchParams={setSearchParams}
       />

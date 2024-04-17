@@ -1,6 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { axiosInstance } from "./constants";
-import { AuctionItem } from "../types";
+import { ItemServerResponse } from "../types";
 
 export const getAllUsers = (): Promise<{ username: string; _id: string }[]> => {
   return fetch("/api/user").then((res) => res.json());
@@ -18,7 +18,7 @@ export const getAllAuctionItems = async (
   order: "DESC" | "ASC",
   limit: number = 10
 ) => {
-  const res: AxiosResponse<AuctionItem[]> = await axiosInstance.get(
+  const res: AxiosResponse<ItemServerResponse> = await axiosInstance.get(
     `/api/items?filter=${filter}&order=${order}&page=${page}&limit=${limit}`
   );
   return res.data;

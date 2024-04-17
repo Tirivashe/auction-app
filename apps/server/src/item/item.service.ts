@@ -22,10 +22,10 @@ export class ItemService {
     @InjectConnection() private connection: Connection,
     private readonly eventEmitter: EventEmitter2,
   ) {}
-  async getAllItems(queryParams: QueryParamsDto): Promise<Item[]> {
+  async getAllItems(queryParams: QueryParamsDto) {
     const { filter = '', order = 'DESC', page = 1, limit = 10 } = queryParams;
     const skip = limit * (page - 1);
-    const items = await this.itemModel
+    const items: Item[] = await this.itemModel
       .find({
         $or: [
           { name: { $regex: filter, $options: 'i' } },
@@ -36,7 +36,11 @@ export class ItemService {
       .limit(limit)
       .skip(skip)
       .populate('winner');
-    return items;
+    const total = await this.itemModel.countDocuments();
+    const hasNext = total > skip + items.length;
+    const hasPrevious = skip > 0;
+    const totalPages = Math.ceil(total / limit);
+    return { items, hasNext, hasPrevious, totalPages };
   }
 
   async getItemById(itemId: string): Promise<Item> {

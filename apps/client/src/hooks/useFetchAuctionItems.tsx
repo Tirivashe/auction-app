@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getAllAuctionItems } from "../api/queries";
-import { AuctionItem, ServerError } from "../types";
+import { ItemServerResponse, ServerError } from "../types";
 
 export const useFetchAuctionItems = ({
   filter,
@@ -13,8 +13,9 @@ export const useFetchAuctionItems = ({
   page?: number | null;
   limit?: number | null;
 }) => {
-  return useQuery<AuctionItem[] | ServerError, ServerError>({
-    queryKey: ["auctionItems"],
+  return useQuery<ItemServerResponse | ServerError, ServerError>({
+    queryKey: ["auctionItems", page],
+    placeholderData: keepPreviousData,
     queryFn: () =>
       getAllAuctionItems(filter || "", page || 1, order || "ASC", limit || 10),
   });

@@ -63,3 +63,10 @@ export type AuctionItem = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type ItemServerResponse = {
+  items: AuctionItem[];
+  hasNext: boolean;
+  hasPrevious: boolean;
+  totalPages: number;
+};
