@@ -6,7 +6,7 @@ export const getAllUsers = (): Promise<{ username: string; _id: string }[]> => {
   return fetch("/api/user").then((res) => res.json());
 };
 
-export const getBidsByItem = async (itemId: string) => {
+export const getBidsByItemId = async (itemId: string) => {
   const res: AxiosResponse<Bid[]> = await axiosInstance.get(
     `/api/bid/${itemId}`
   );

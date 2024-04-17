@@ -14,7 +14,7 @@ const ItemList = ({ items }: Props) => {
       spacing="md"
     >
       {items.map((item) => (
-        <Item item={item} />
+        <Item item={item} key={item._id} />
       ))}
     </SimpleGrid>
   );
