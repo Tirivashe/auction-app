@@ -33,10 +33,12 @@ export const getRemainingTime = (deadline: Date) => {
   const now = new Date();
   dayjs.extend(duration);
   const remainingTime = dayjs.duration(dayjs(deadline).diff(now));
+  const hasExpired = remainingTime.asMilliseconds() < 0;
   return {
     days: remainingTime.days(),
     hours: remainingTime.hours(),
     minutes: remainingTime.minutes(),
     seconds: remainingTime.seconds(),
+    hasExpired,
   };
 };

@@ -30,18 +30,27 @@ const ItemDetailsPage = () => {
   const user = useAuthStore((state) => state.user);
   const { data: item, isError, isLoading } = useFetchItemById(id ?? "");
   const [amount, setAmount] = useState(1);
+  const [showWinner, setShowWinner] = useState(false);
 
   const [remainingTime, setRemainingTime] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
+    hasExpired: false,
   });
 
   const handleBid = (itemId: string, e: React.FormEvent<HTMLDivElement>) => {
     e.preventDefault();
     socket.emit("createBidding", { itemId, userId: user?._id, amount });
   };
+
+  useEffect(() => {
+    if (remainingTime.hasExpired) {
+      queryClient.invalidateQueries({ queryKey: ["item", id] });
+      setShowWinner(true);
+    }
+  }, [remainingTime.hasExpired, queryClient, id]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -52,10 +61,8 @@ const ItemDetailsPage = () => {
       return;
     }
     const intervalId = setInterval(() => {
-      const { days, hours, minutes, seconds } = getRemainingTime(
-        item.expiresAt
-      );
-      setRemainingTime({ days, hours, minutes, seconds });
+      const time = getRemainingTime(item.expiresAt);
+      setRemainingTime({ ...time });
     }, 1000);
 
     return () => clearInterval(intervalId);
@@ -102,25 +109,35 @@ const ItemDetailsPage = () => {
 
   return (
     <Container className={classes.container} my="sm">
-      <Stack py="md" gap={0}>
-        <Text ta="center" fz="2.25rem" fw="700">
-          Auction Ending Soon!
-        </Text>
-        <Group gap="sm" align="center" justify="center">
-          {Object.entries(remainingTime).map(([key, time]) => (
-            <Paper shadow="sm" radius="md" p="md" key={key}>
-              <Stack>
-                <Text size="3.5rem" fw="700">
-                  {time}
-                </Text>
-                <Text ta="center" size="sm">
-                  {key}
-                </Text>
-              </Stack>
-            </Paper>
-          ))}
-        </Group>
-      </Stack>
+      {!showWinner && (
+        <Stack py="md" gap={0}>
+          <Text ta="center" fz="2.25rem" fw="700">
+            Auction Ending Soon!
+          </Text>
+          <Group gap="sm" align="center" justify="center">
+            {Object.entries(remainingTime).map(([key, time]) => {
+              if (typeof time === "boolean") return;
+              return (
+                <Paper shadow="sm" radius="md" p="md" key={key}>
+                  <Stack>
+                    <Text ta="center" size="3.5rem" fw="700">
+                      {time}
+                    </Text>
+                    <Text ta="center" size="sm">
+                      {key}
+                    </Text>
+                  </Stack>
+                </Paper>
+              );
+            })}
+          </Group>
+        </Stack>
+      )}
+      {showWinner && (
+        <Title size="3.5rem" ta="center" c="green.8" py="xl">
+          The winner is {item?.winner?.username ?? "..."}
+        </Title>
+      )}
       <Group mt="2rem" gap="lg" justify="space-between" align="flex-start">
         <Stack
           gap="lg"
