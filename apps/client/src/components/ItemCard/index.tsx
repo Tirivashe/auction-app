@@ -1,12 +1,13 @@
 import { Badge, Button, Card, Group, Image, Text } from "@mantine/core";
 import { AuctionItem } from "../../types";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   item: AuctionItem;
 };
 
 const ItemCard = ({ item }: Props) => {
+  const navigate = useNavigate();
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>
@@ -32,8 +33,7 @@ const ItemCard = ({ item }: Props) => {
         mt="md"
         radius="md"
         disabled={!item.isActive}
-        component={Link}
-        to={`/items/${item._id}`}
+        onClick={() => navigate(`/items/${item._id}`)}
       >
         Bid Now!
       </Button>
