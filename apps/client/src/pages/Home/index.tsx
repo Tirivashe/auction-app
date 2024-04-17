@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useQueryClient } from "@tanstack/react-query";
 import ItemList from "../../components/ItemList";
+import { IconChevronCompactUp } from "@tabler/icons-react";
 
 const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,6 +33,13 @@ const HomePage = () => {
   const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchParams((prev) => {
       prev.set("filter", e.target.value);
+      return prev;
+    });
+  };
+
+  const sortPrices = () => {
+    setSearchParams((prev) => {
+      prev.set("order", prev.get("order") === "DESC" ? "ASC" : "DESC");
       return prev;
     });
   };
@@ -66,14 +74,23 @@ const HomePage = () => {
 
   return (
     <Stack p="lg" gap="xl">
-      <Flex gap="sm">
+      <Flex gap="xl" px="2rem">
         <TextInput
           flex={1}
           placeholder="Filter items"
           onChange={handleFilter}
           value={filter || ""}
         />
-        <Button>Filter</Button>
+        <Button
+          rightSection={
+            <IconChevronCompactUp
+              style={{ rotate: order === "DESC" ? "180deg" : "0deg" }}
+            />
+          }
+          onClick={sortPrices}
+        >
+          Sort Price
+        </Button>
       </Flex>
       <ItemList items={data.items} />
       <Group justify="flex-end">
