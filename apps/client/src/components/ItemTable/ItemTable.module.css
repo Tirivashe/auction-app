@@ -20,5 +20,6 @@
   border-radius: rem(21px) !important;
 }
 
-.wrapper {
+.root {
+  margin-bottom: 0 !important;
 }
