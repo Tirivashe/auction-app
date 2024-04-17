@@ -19,9 +19,7 @@ const Item = ({ item }: Props) => {
 
       <Group justify="space-between" mt="md" mb="xs">
         <Text fw={500}>{item.name}</Text>
-        <Badge color={item.isActive ? "green" : "pink.8"}>
-          {item.isActive ? "Active" : "Closed"}
-        </Badge>
+        <Badge color="pink.7">Price: ${item.price}</Badge>
       </Group>
 
       <Text size="sm" c="dimmed">
