@@ -6,7 +6,7 @@ type Props = {
   item: AuctionItem;
 };
 
-const Item = ({ item }: Props) => {
+const ItemCard = ({ item }: Props) => {
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>
@@ -41,4 +41,4 @@ const Item = ({ item }: Props) => {
   );
 };
 
-export default Item;
+export default ItemCard;

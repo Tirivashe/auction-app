@@ -1,6 +1,6 @@
 import { AuctionItem } from "../../types";
 import { SimpleGrid } from "@mantine/core";
-import Item from "../Item";
+import ItemCard from "../ItemCard";
 
 type Props = {
   items: AuctionItem[];
@@ -14,7 +14,7 @@ const ItemList = ({ items }: Props) => {
       spacing="md"
     >
       {items.map((item) => (
-        <Item item={item} key={item._id} />
+        <ItemCard item={item} key={item._id} />
       ))}
     </SimpleGrid>
   );
