@@ -17,17 +17,31 @@ import { useParams } from "react-router-dom";
 import classes from "./ItemDetails.module.css";
 import useFetchItemById from "../../hooks/useFetchItemById";
 import { getRemainingTime } from "../../utils";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useGetSocketContext } from "../../WebsocketContext";
+import { useQueryClient } from "@tanstack/react-query";
+import BidsList from "../../components/BidsList";
+import { useAuthStore } from "../../store";
 
 const ItemDetailsPage = () => {
   const { id } = useParams();
+  const socket = useGetSocketContext();
+  const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const { data: item, isError, isLoading } = useFetchItemById(id ?? "");
+  const [amount, setAmount] = useState(1);
+
   const [remainingTime, setRemainingTime] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
+
+  const handleBid = (itemId: string, e: React.FormEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    socket.emit("createBidding", { itemId, userId: user?._id, amount });
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -46,6 +60,21 @@ const ItemDetailsPage = () => {
 
     return () => clearInterval(intervalId);
   }, [item]);
+
+  useEffect(() => {
+    socket.on("connected", () => {
+      console.log("web socket connected!!");
+    });
+
+    socket.on("bid.created", () => {
+      queryClient.invalidateQueries({ queryKey: ["bids"] });
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("bid.created");
+    };
+  }, [socket, queryClient]);
 
   if (isLoading) {
     return (
@@ -66,7 +95,7 @@ const ItemDetailsPage = () => {
   if (!item) {
     return (
       <Center h="100vh" w="100vw" style={{ overflow: "hidden" }}>
-        <h2>No items for auctioning found</h2>
+        <h2>No item for auctioning found</h2>
       </Center>
     );
   }
@@ -93,7 +122,11 @@ const ItemDetailsPage = () => {
         </Group>
       </Stack>
       <Group mt="2rem" gap="lg" justify="space-between" align="flex-start">
-        <Stack gap="lg">
+        <Stack
+          gap="lg"
+          component="form"
+          onSubmit={(e) => handleBid(item._id, e)}
+        >
           <Title fz="2.25rem">{item.name}</Title>
           <Flex gap="md" align="center">
             <Group gap="sm" justify="space-between" align="center">
@@ -110,10 +143,14 @@ const ItemDetailsPage = () => {
                 allowDecimal={false}
                 min={1}
                 required
+                value={amount}
+                onChange={(e) => setAmount(e as number)}
               />
             </Group>
           </Flex>
-          <Button fullWidth>Submit Bid</Button>
+          <Button type="submit" fullWidth>
+            Submit Bid
+          </Button>
         </Stack>
         <Image
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
@@ -128,8 +165,8 @@ const ItemDetailsPage = () => {
           <Text>{item.description}</Text>
         </Stack>
         <Stack>
-          <Title>Previous Bids</Title>
-          <Text>There are no previous bids</Text>
+          <Title>Latest Bids</Title>
+          <BidsList itemId={item._id} />
         </Stack>
       </Stack>
     </Container>
