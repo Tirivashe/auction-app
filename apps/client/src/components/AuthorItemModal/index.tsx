@@ -14,6 +14,7 @@ import { useCreateItem } from "../../hooks/useCreateItem";
 import { modifyFormData } from "../../utils";
 import { useUpdateItem } from "../../hooks/useUpdateItem";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 type Props = {
   mode: "create" | "edit";
@@ -21,12 +22,18 @@ type Props = {
   close: () => void;
 };
 
-const AuthorItemModal = ({ mode, itemId }: Props) => {
+const AuthorItemModal = ({ mode, itemId, close }: Props) => {
   const queryClient = useQueryClient();
-  const { mutate: createItemMutation, isPending: isCreatePending } =
-    useCreateItem();
-  const { mutate: updateItemMutation, isPending: isUpdatePending } =
-    useUpdateItem(itemId ?? "");
+  const {
+    mutate: createItemMutation,
+    isPending: isCreatePending,
+    isSuccess: isCreateSuccess,
+  } = useCreateItem();
+  const {
+    mutate: updateItemMutation,
+    isPending: isUpdatePending,
+    isSuccess: isUpdateSuccess,
+  } = useUpdateItem(itemId ?? "");
   const form = useForm<UpdateItemDto>({
     mode: "uncontrolled",
     initialValues: {
@@ -45,12 +52,17 @@ const AuthorItemModal = ({ mode, itemId }: Props) => {
     const newFormValues = modifyFormData(formValues);
     if (mode === "create") {
       createItemMutation(newFormValues);
-      queryClient.invalidateQueries({ queryKey: ["auctionItems"] });
       return;
     }
     updateItemMutation(newFormValues);
-    queryClient.invalidateQueries({ queryKey: ["auctionItems"] });
   };
+
+  useEffect(() => {
+    if (isCreateSuccess || isUpdateSuccess) {
+      close();
+      queryClient.invalidateQueries({ queryKey: ["auctionItems"] });
+    }
+  }, [isCreateSuccess, isUpdateSuccess, close, queryClient]);
 
   return (
     <Paper component="form" onSubmit={form.onSubmit(handleSubmit)}>

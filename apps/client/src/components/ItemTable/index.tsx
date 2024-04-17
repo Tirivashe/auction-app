@@ -141,7 +141,7 @@ export function ItemTable({ data, searchParams, setSearchParams }: TableProps) {
               stroke={1.5}
             />
           }
-          className={classes.wrapper}
+          className={classes.root}
           value={searchParams.get("filter") || ""}
           onChange={handleSearchChange}
         />
