@@ -15,10 +15,11 @@ export const getBidsByItemId = (
 export const getAllAuctionItems = async (
   filter: string = "",
   page: number = 1,
-  order: "DESC" | "ASC"
+  order: "DESC" | "ASC",
+  limit: number = 10
 ) => {
   const res: AxiosResponse<AuctionItem[]> = await axiosInstance.get(
-    `/api/items?filter=${filter}&order=${order}&page=${page}`
+    `/api/items?filter=${filter}&order=${order}&page=${page}&limit=${limit}`
   );
   return res.data;
 };

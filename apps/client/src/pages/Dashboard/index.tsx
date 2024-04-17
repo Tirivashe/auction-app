@@ -11,13 +11,16 @@ const DashboardPage = () => {
   const queryClient = useQueryClient();
   const filter = searchParams.get("filter");
   const order = searchParams.get("order") as "DESC" | "ASC" | null;
-  const page = searchParams.get("page") as number | null;
   const deferredFilter = useDebounce(filter, 500);
   const {
     data: items,
     isError,
     isLoading,
-  } = useFetchAuctionItems({ filter: deferredFilter, order, page });
+  } = useFetchAuctionItems({
+    filter: deferredFilter,
+    order,
+    limit: 1000,
+  });
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["auctionItems"] });
