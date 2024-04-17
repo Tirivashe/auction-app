@@ -23,18 +23,14 @@ export class ItemService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
   async getAllItems(queryParams: QueryParamsDto): Promise<Item[]> {
-    const {
-      description = '',
-      name = '',
-      order = 'DESC',
-      page = 1,
-      limit = 10,
-    } = queryParams;
+    const { filter = '', order = 'DESC', page = 1, limit = 10 } = queryParams;
     const skip = limit * (page - 1);
     const items = await this.itemModel
       .find({
-        name: { $regex: name, $options: 'i' },
-        description: { $regex: description, $options: 'i' },
+        $or: [
+          { name: { $regex: filter, $options: 'i' } },
+          { description: { $regex: filter, $options: 'i' } },
+        ],
       })
       .sort({ price: order === 'ASC' ? 'asc' : 'desc' })
       .limit(limit)
@@ -55,21 +51,18 @@ export class ItemService {
       ...rest,
     });
     this.eventEmitter.emit(ItemEvents.CREATED, createdItem);
-    return { message: 'Item created', status: HttpStatus.CREATED };
+    return { message: 'Item created', statusCode: HttpStatus.CREATED };
   }
 
   async updateItem(updateItemDto: UpdateItemDto, id: string) {
-    const updatedItem = await this.itemModel.updateOne(
-      { _id: id },
-      updateItemDto,
-    );
+    await this.itemModel.updateOne({ _id: id }, updateItemDto);
     this.eventEmitter.emit(ItemEvents.UPDATED, { id, updateItemDto });
-    return updatedItem;
+    return { message: 'Item edited', statusCode: HttpStatus.CREATED };
   }
   async deleteItem(id: string) {
     await this.itemModel.deleteOne({ _id: id });
     this.eventEmitter.emit(ItemEvents.DELETED, id);
-    return { message: 'Item Deleted', status: HttpStatus.OK };
+    return { message: 'Item Deleted', statusCode: HttpStatus.OK };
   }
 
   @OnEvent(BidEvents.CLOSED)
