@@ -29,16 +29,15 @@ export const getAllAuctionItems = async (
   return res.data;
 };
 
-export const getItemById = async (itemId: string) => {
-  const res: AxiosResponse<AuctionItem> = await axiosInstance.get(
-    `/api/items/${itemId}`
-  );
+export const getItemById = async (userId: string, itemId: string) => {
+  const res: AxiosResponse<{ item: AuctionItem; autobid: boolean }> =
+    await axiosInstance.get(`/api/items/${itemId}/user/${userId}`);
   return res.data;
 };
 
 export const getUserBiddingHistory = async (userId: string) => {
   const res: AxiosResponse<UserBiddingHistory[]> = await axiosInstance.get(
-    `api/user/${userId}/history`
+    `/api/user/${userId}/history`
   );
   return res.data;
 };

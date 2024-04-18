@@ -98,7 +98,7 @@ const ProfilePage = () => {
         </Table>
       </ScrollArea>
       <Modal opened={opened} onClose={close} centered title="Invoice">
-        <Bill itemId={itemId} />
+        <Bill userId={user?._id ?? ""} itemId={itemId} />
       </Modal>
     </Container>
   );

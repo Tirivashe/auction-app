@@ -2,6 +2,7 @@ import {
   Badge,
   Button,
   Center,
+  Checkbox,
   Container,
   Flex,
   Group,
@@ -22,20 +23,21 @@ import { useGetSocketContext } from "../../WebsocketContext";
 import { useQueryClient } from "@tanstack/react-query";
 import BidsList from "../../components/BidsList";
 import { useAuthStore } from "../../store";
+import useToggleAutoBid from "../../hooks/useToggleAutoBid";
 
 const ItemDetailsPage = () => {
   const { id } = useParams();
   const socket = useGetSocketContext();
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
-  const {
-    data: item,
-    isError,
-    isLoading,
-    isFetching,
-  } = useFetchItemById(id ?? "");
   const [amount, setAmount] = useState(1);
   const [showWinner, setShowWinner] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const { mutate } = useToggleAutoBid(user?._id ?? "", id ?? "");
+  const { data, isError, isLoading, isFetching } = useFetchItemById(
+    user?._id ?? "",
+    id ?? ""
+  );
 
   const [remainingTime, setRemainingTime] = useState({
     days: 0,
@@ -47,7 +49,17 @@ const ItemDetailsPage = () => {
 
   const handleBid = (itemId: string, e: React.FormEvent<HTMLDivElement>) => {
     e.preventDefault();
-    socket.emit("createBidding", { itemId, userId: user?._id, amount });
+    socket.emit("createBidding", {
+      itemId,
+      userId: user?._id,
+      amount,
+      autobid: checked,
+    });
+  };
+
+  const handleAutoBidChange = () => {
+    mutate();
+    setChecked((prev) => !prev);
   };
 
   useEffect(() => {
@@ -59,19 +71,20 @@ const ItemDetailsPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (typeof item === "object" && "error" in item) {
+    if (typeof data === "object" && "error" in data) {
       return;
     }
-    if (!item) {
+    if (!data) {
       return;
     }
+    setChecked(data.autobid);
     const intervalId = setInterval(() => {
-      const time = getRemainingTime(item.expiresAt);
+      const time = getRemainingTime(data.item.expiresAt);
       setRemainingTime({ ...time });
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [item]);
+  }, [data]);
 
   useEffect(() => {
     socket.on("connected", () => {
@@ -96,7 +109,7 @@ const ItemDetailsPage = () => {
     );
   }
 
-  if (isError || (typeof item === "object" && "error" in item)) {
+  if (isError || (typeof data === "object" && "error" in data)) {
     return (
       <Center h="100vh" w="100vw" style={{ overflow: "hidden" }}>
         <h2>Something went wrong</h2>
@@ -104,7 +117,7 @@ const ItemDetailsPage = () => {
     );
   }
 
-  if (!item) {
+  if (!data) {
     return (
       <Center h="100vh" w="100vw" style={{ overflow: "hidden" }}>
         <h2>No item for auctioning found</h2>
@@ -140,28 +153,28 @@ const ItemDetailsPage = () => {
       )}
       {showWinner && (
         <Title tt="capitalize" size="2.5rem" ta="center" c="green.8" py="xl">
-          Awarded to {isFetching ? "..." : item?.winner?.username || "no one"}{" "}
-          for ${isFetching ? "" : item.awardedFor}
+          Awarded to{" "}
+          {isFetching ? "..." : data.item?.winner?.username || "no one"} for $
+          {isFetching ? "" : data.item.awardedFor}
         </Title>
       )}
       <Group mt="2rem" gap="lg" justify="space-between" align="flex-start">
         <Stack
           gap="lg"
           component="form"
-          onSubmit={(e) => handleBid(item._id, e)}
+          onSubmit={(e) => handleBid(data.item._id, e)}
         >
-          <Title fz="2.25rem">{item.name}</Title>
+          <Title fz="2.25rem">{data.item.name}</Title>
           <Flex gap="md" align="center">
             <Group gap="sm" justify="space-between" align="center">
               <Text size="1.25rem" fw="500">
-                ${item.price}
+                ${data.item.price}
               </Text>
               <Badge>Current Price</Badge>
             </Group>
             <Group gap="sm" align="center" justify="space-between">
-              <Text fz="h4">Your bid</Text>
               <NumberInput
-                label="Price"
+                label="Your bid here"
                 prefix="$"
                 allowDecimal={false}
                 min={1}
@@ -171,9 +184,22 @@ const ItemDetailsPage = () => {
               />
             </Group>
           </Flex>
-          <Button type="submit" fullWidth disabled={!item?.isActive}>
-            Submit Bid
-          </Button>
+          <Group justify="space-between">
+            <Button
+              flex={1}
+              type="submit"
+              fullWidth
+              disabled={!data.item?.isActive}
+            >
+              Submit Bid
+            </Button>
+            <Checkbox
+              checked={checked}
+              label="Autobid"
+              disabled={!data.item?.isActive}
+              onClick={handleAutoBidChange}
+            />
+          </Group>
         </Stack>
         <Image
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
@@ -185,11 +211,11 @@ const ItemDetailsPage = () => {
       <Stack gap="3rem" my="3rem">
         <Stack>
           <Title>Description</Title>
-          <Text>{item.description}</Text>
+          <Text>{data.item.description}</Text>
         </Stack>
         <Stack>
           <Title>Latest Bids</Title>
-          <BidsList itemId={item._id} />
+          <BidsList itemId={data.item._id} />
         </Stack>
       </Stack>
     </Container>
