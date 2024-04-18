@@ -28,7 +28,12 @@ const ItemDetailsPage = () => {
   const socket = useGetSocketContext();
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
-  const { data: item, isError, isLoading } = useFetchItemById(id ?? "");
+  const {
+    data: item,
+    isError,
+    isLoading,
+    isFetching,
+  } = useFetchItemById(id ?? "");
   const [amount, setAmount] = useState(1);
   const [showWinner, setShowWinner] = useState(false);
 
@@ -134,8 +139,9 @@ const ItemDetailsPage = () => {
         </Stack>
       )}
       {showWinner && (
-        <Title size="3.5rem" ta="center" c="green.8" py="xl">
-          The winner is {item?.winner?.username ?? "..."}
+        <Title tt="capitalize" size="3.5rem" ta="center" c="green.8" py="xl">
+          The winner is{" "}
+          {isFetching ? "..." : item?.winner?.username || "no one"}
         </Title>
       )}
       <Group mt="2rem" gap="lg" justify="space-between" align="flex-start">

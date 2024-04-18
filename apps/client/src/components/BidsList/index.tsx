@@ -38,10 +38,11 @@ const BidsList = ({ itemId }: Props) => {
         <Group
           justify="apart"
           align="center"
+          px="md"
           key={bid._id}
           style={{ borderBottom: "1px solid var(--mantine-color-gray-3)" }}
         >
-          <Text size="xl" fw="400" flex={1}>
+          <Text size="xl" fw="400" tt="capitalize" flex={1}>
             {bid.user.username}
           </Text>
           <Text size="xl" fw="600">
