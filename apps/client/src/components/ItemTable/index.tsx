@@ -27,7 +27,7 @@ import { AuctionItem } from "../../types";
 import { useDeleteItem } from "../../hooks/useDeleteItem";
 import { useQueryClient } from "@tanstack/react-query";
 import AuthorItemModal from "../AuthorItemModal";
-import { SetURLSearchParams } from "react-router-dom";
+import { SetURLSearchParams, useNavigate } from "react-router-dom";
 import { formatTime } from "../../utils";
 
 type TableProps = {
@@ -68,6 +68,7 @@ export function ItemTable({ data, searchParams, setSearchParams }: TableProps) {
   const queryClient = useQueryClient();
   const { isSuccess, mutate } = useDeleteItem();
   const [sorted, setSorted] = useState(false);
+  const navigate = useNavigate();
   const [
     createModalOpened,
     { open: openCreateModal, close: closeCreateModal },
@@ -103,7 +104,11 @@ export function ItemTable({ data, searchParams, setSearchParams }: TableProps) {
   }, [isSuccess, queryClient]);
 
   const rows = data.map((row) => (
-    <Table.Tr key={row._id}>
+    <Table.Tr
+      key={row._id}
+      className={classes["table-row"]}
+      onClick={() => navigate(`/items/${row._id}`)}
+    >
       <Table.Td>{row.name}</Table.Td>
       <Table.Td>{row.description}</Table.Td>
       <Table.Td>{row.isActive.toString()}</Table.Td>
@@ -113,13 +118,19 @@ export function ItemTable({ data, searchParams, setSearchParams }: TableProps) {
         <Group gap="md">
           <ActionIcon
             style={{ background: "transparent" }}
-            onClick={() => handleEdit(row._id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEdit(row._id);
+            }}
           >
             <IconPencil size="1.2rem" color="green" />
           </ActionIcon>
           <ActionIcon
             style={{ background: "transparent" }}
-            onClick={() => mutate(row._id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              mutate(row._id);
+            }}
           >
             <IconTrash size="1.2rem" color="red" />
           </ActionIcon>
