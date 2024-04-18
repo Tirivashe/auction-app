@@ -47,3 +47,15 @@ export const updateItem = async (
 export const toggleAutoBid = (userId: string, itemId: string) => {
   return axiosInstance.patch("/api/user/toggle-autobid", { userId, itemId });
 };
+
+export const setUserAutobidConfig = async (
+  userId: string,
+  maxBidAmount: number,
+  autoBidPercentage: number
+) => {
+  const res: AxiosResponse<void> = await axiosInstance.patch(
+    `/api/user/${userId}/settings`,
+    { maxBidAmount, autoBidPercentage }
+  );
+  return res.data;
+};

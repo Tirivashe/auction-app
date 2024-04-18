@@ -4,6 +4,7 @@ import {
   AuctionItem,
   Bid,
   ItemServerResponse,
+  TAutobidConfig,
   UserBiddingHistory,
 } from "../types";
 
@@ -38,6 +39,13 @@ export const getItemById = async (userId: string, itemId: string) => {
 export const getUserBiddingHistory = async (userId: string) => {
   const res: AxiosResponse<UserBiddingHistory[]> = await axiosInstance.get(
     `/api/user/${userId}/history`
+  );
+  return res.data;
+};
+
+export const getUserAutobidConfig = async (userId: string) => {
+  const res: AxiosResponse<TAutobidConfig> = await axiosInstance.get(
+    `/api/user/${userId}/settings`
   );
   return res.data;
 };
