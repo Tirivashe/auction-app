@@ -39,14 +39,14 @@ const BidsList = ({ itemId }: Props) => {
           justify="apart"
           align="center"
           px="md"
-          key={bid._id}
+          key={bid?._id}
           style={{ borderBottom: "1px solid var(--mantine-color-gray-3)" }}
         >
           <Text size="xl" fw="400" tt="capitalize" flex={1}>
-            {bid.user.username}
+            {bid?.user?.username}
           </Text>
           <Text size="xl" fw="600">
-            ${bid.bidAmount}
+            ${bid?.bidAmount}
           </Text>
         </Group>
       ))}
