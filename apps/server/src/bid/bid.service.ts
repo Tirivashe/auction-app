@@ -28,7 +28,8 @@ export class BidService {
     return await this.bidModel
       .find({ item: itemId })
       .populate('item')
-      .populate('user');
+      .populate('user')
+      .sort({ createdAt: 'desc' });
   }
 
   // @OnEvent(BidEvents.AUTO_BID_CREATED, { async: true })
