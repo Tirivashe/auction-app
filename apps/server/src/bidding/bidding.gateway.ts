@@ -27,16 +27,6 @@ export class BiddingGateway
     await this.biddingService.onCreateBid(createBiddingDto, this.server);
   }
 
-  @SubscribeMessage('findAllBidding')
-  findAll() {
-    return this.biddingService.findAll();
-  }
-
-  @SubscribeMessage('findOneBidding')
-  findOne(@MessageBody() id: number) {
-    return this.biddingService.findOne(id);
-  }
-
   @SubscribeMessage('message')
   helloFromServer(@MessageBody() message: string) {
     this.server.emit(
