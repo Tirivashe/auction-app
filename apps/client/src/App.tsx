@@ -7,6 +7,7 @@ import ItemDetailsPage from "./pages/ItemDetails";
 import DashboardPage from "./pages/Dashboard";
 import ProfilePage from "./pages/Profile";
 import AdminOnlyRoute from "./components/AdminOnlyRoute";
+import AutobidConfig from "./pages/AutobidConfig";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
         ),
       },
       { path: "profile", element: <ProfilePage /> },
+      { path: "config/:id", element: <AutobidConfig /> },
     ],
   },
 ]);

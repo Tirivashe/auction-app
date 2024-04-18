@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Badge,
   Button,
   Center,
@@ -14,7 +15,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import classes from "./ItemDetails.module.css";
 import useFetchItemById from "../../hooks/useFetchItemById";
 import { getRemainingTime } from "../../utils";
@@ -24,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import BidsList from "../../components/BidsList";
 import { useAuthStore } from "../../store";
 import useToggleAutoBid from "../../hooks/useToggleAutoBid";
+import { IconSettings } from "@tabler/icons-react";
 
 const ItemDetailsPage = () => {
   const { id } = useParams();
@@ -34,6 +36,7 @@ const ItemDetailsPage = () => {
   const [showWinner, setShowWinner] = useState(false);
   const [checked, setChecked] = useState(false);
   const { mutate } = useToggleAutoBid(user?._id ?? "", id ?? "");
+  const navigate = useNavigate();
   const { data, isError, isLoading, isFetching } = useFetchItemById(
     user?._id ?? "",
     id ?? ""
@@ -170,7 +173,7 @@ const ItemDetailsPage = () => {
               <Text size="1.25rem" fw="500">
                 ${data.item.price}
               </Text>
-              <Badge>Current Price</Badge>
+              <Badge size="xs">Current Price</Badge>
             </Group>
             <Group gap="sm" align="center" justify="space-between">
               <NumberInput
@@ -199,6 +202,15 @@ const ItemDetailsPage = () => {
               disabled={!data.item?.isActive}
               onClick={handleAutoBidChange}
             />
+            <ActionIcon
+              onClick={() => navigate(`/config/${user?._id}`)}
+              disabled={!data.item.isActive}
+            >
+              <IconSettings
+                style={{ width: "80%", height: "80%" }}
+                stroke={1.5}
+              />
+            </ActionIcon>
           </Group>
         </Stack>
         <Image

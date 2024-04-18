@@ -96,3 +96,10 @@ export type UserBiddingHistory = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type TAutobidConfig = {
+  user: User;
+  maxBidAmount: number;
+  totalAmountReserved: number;
+  autoBidPercentage: number;
+};
