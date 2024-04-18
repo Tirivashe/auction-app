@@ -59,7 +59,7 @@ export class UserService {
     };
   }
 
-  async getBiddingHistory(userId: string) {
+  async getBiddingHistory(userId: string): Promise<BiddingHistory[]> {
     return await this.biddingHistoryModel
       .find({ user: userId })
       .populate('bids')
