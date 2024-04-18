@@ -13,7 +13,7 @@ export class BillingController {
   }
 
   @Get(':id')
-  async getBillById(@Param('id') userId: string) {
-    return await this.billingService.getBillById(userId);
+  async getBillById(@Param('id') itemId: string) {
+    return await this.billingService.getBillById(itemId);
   }
 }

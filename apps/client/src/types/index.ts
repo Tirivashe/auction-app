@@ -79,3 +79,20 @@ export type Bid = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export enum BidStatus {
+  Won = "won",
+  Lost = "lost",
+  InProgress = "in_progress",
+}
+
+export type UserBiddingHistory = {
+  _id: string;
+  user: User;
+  item: AuctionItem;
+  bids: Bid[];
+  bidStatus: BidStatus;
+  autoBid: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};

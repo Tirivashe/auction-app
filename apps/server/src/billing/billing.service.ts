@@ -33,9 +33,9 @@ export class BillingService {
     return await this.billingModel.find().populate(['user', 'item']);
   }
 
-  async getBillById(userId: string): Promise<Bill[]> {
+  async getBillById(itemId: string): Promise<Bill> {
     return await this.billingModel
-      .find({ user: userId })
+      .findOne({ item: itemId })
       .populate(['user', 'item']);
   }
 }
