@@ -44,8 +44,19 @@ export class ItemService {
     return { items, hasNext, hasPrevious, totalPages };
   }
 
-  async getItemById(itemId: string): Promise<Item> {
-    return await this.itemModel.findOne({ _id: itemId }).populate('winner');
+  async getItemById(
+    itemId: string,
+    userId: string,
+  ): Promise<{ item: Item; autobid: boolean }> {
+    const userBid = await this.biddingHistoryModel.findOne({
+      user: userId,
+      item: itemId,
+    });
+    const item: Item = await this.itemModel
+      .findOne({ _id: itemId })
+      .populate('winner');
+
+    return { item, autobid: userBid?.autobid || false };
   }
 
   async createItem(createItemDto: CreateItemDto) {

@@ -31,9 +31,12 @@ export class ItemController {
     return await this.itemService.getAllItems(queryParams);
   }
 
-  @Get('items/:id')
-  async getItemById(@Param('id') id: string) {
-    return await this.itemService.getItemById(id);
+  @Get('items/:itemId/user/:userId')
+  async getItemById(
+    @Param('itemId') itemId: string,
+    @Param('userId') userId: string,
+  ) {
+    return await this.itemService.getItemById(itemId, userId);
   }
 
   @Post('item')
