@@ -139,9 +139,9 @@ const ItemDetailsPage = () => {
         </Stack>
       )}
       {showWinner && (
-        <Title tt="capitalize" size="3.5rem" ta="center" c="green.8" py="xl">
-          The winner is{" "}
-          {isFetching ? "..." : item?.winner?.username || "no one"}
+        <Title tt="capitalize" size="2.5rem" ta="center" c="green.8" py="xl">
+          Awarded to {isFetching ? "..." : item?.winner?.username || "no one"}{" "}
+          for ${isFetching ? "" : item.awardedFor}
         </Title>
       )}
       <Group mt="2rem" gap="lg" justify="space-between" align="flex-start">
@@ -171,7 +171,7 @@ const ItemDetailsPage = () => {
               />
             </Group>
           </Flex>
-          <Button type="submit" fullWidth>
+          <Button type="submit" fullWidth disabled={!item?.isActive}>
             Submit Bid
           </Button>
         </Stack>

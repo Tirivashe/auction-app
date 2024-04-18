@@ -32,7 +32,6 @@ const ItemCard = ({ item }: Props) => {
         fullWidth
         mt="md"
         radius="md"
-        disabled={!item.isActive}
         onClick={() => navigate(`/items/${item._id}`)}
       >
         Bid Now!
