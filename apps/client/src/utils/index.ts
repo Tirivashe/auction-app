@@ -42,3 +42,7 @@ export const getRemainingTime = (deadline: Date) => {
     hasExpired,
   };
 };
+
+export const formatTime = (time: Date) => {
+  return dayjs(time).format("DD MMM, YYYY hh:mm A");
+};

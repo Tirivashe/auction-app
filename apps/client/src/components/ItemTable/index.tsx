@@ -22,13 +22,13 @@ import {
   IconPencil,
   IconTrash,
 } from "@tabler/icons-react";
-import dayjs from "dayjs";
 import classes from "./ItemTable.module.css";
 import { AuctionItem } from "../../types";
 import { useDeleteItem } from "../../hooks/useDeleteItem";
 import { useQueryClient } from "@tanstack/react-query";
 import AuthorItemModal from "../AuthorItemModal";
 import { SetURLSearchParams } from "react-router-dom";
+import { formatTime } from "../../utils";
 
 type TableProps = {
   data: AuctionItem[];
@@ -107,7 +107,7 @@ export function ItemTable({ data, searchParams, setSearchParams }: TableProps) {
       <Table.Td>{row.name}</Table.Td>
       <Table.Td>{row.description}</Table.Td>
       <Table.Td>{row.isActive.toString()}</Table.Td>
-      <Table.Td>{dayjs(row.expiresAt).format("DD MMM, YYYY hh:mm A")}</Table.Td>
+      <Table.Td>{formatTime(row.expiresAt)}</Table.Td>
       <Table.Td>${row.price}</Table.Td>
       <Table.Td>
         <Group gap="md">
