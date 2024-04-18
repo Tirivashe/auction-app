@@ -43,3 +43,7 @@ export const updateItem = async (
   const res = await axiosInstance.patch(`/api/item/${itemId}`, updateItemDto);
   return res.data;
 };
+
+export const toggleAutoBid = (userId: string, itemId: string) => {
+  return axiosInstance.patch("/api/user/toggle-autobid", { userId, itemId });
+};
