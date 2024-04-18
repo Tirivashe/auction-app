@@ -20,7 +20,7 @@ import { BiddingModule } from './bidding/bidding.module';
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     MongooseModule.forRoot(
-      'mongodb://127.0.0.1:27017/tiri?directConnection=true',
+      'mongodb+srv://tdummy999:VrOUL32BpHlJrFke@auctioncluster.s6n2al6.mongodb.net/?retryWrites=true&w=majority&appName=AuctionCluster',
     ),
     UserModule,
     AuthModule,
