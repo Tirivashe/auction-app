@@ -23,3 +23,7 @@
 .root {
   margin-bottom: 0 !important;
 }
+
+.table-row {
+  cursor: pointer;
+}
