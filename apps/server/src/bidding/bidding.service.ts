@@ -72,7 +72,7 @@ export class BiddingService {
         settings?.totalAmountReserved + nextBidAmount >=
         settings?.maxBidAmount
       ) {
-        this.eventEmitter.emit(BidEvents.AUTO_BID_EXCEDDED, user.user._id);
+        this.eventEmitter.emit(BidEvents.AUTO_BID_EXCEEDED, user.user._id);
         continue;
       }
       await this.onCreateBid(

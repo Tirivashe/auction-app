@@ -12,6 +12,7 @@ import { BiddingHistory } from 'src/bid/schema/bid-history.schema';
 import { Model } from 'mongoose';
 import { BillingEvents } from 'src/billing/events/billing.events';
 import { CreateBiddingDto } from 'src/bidding/dto/create-bidding.dto';
+import { Status } from 'src/types';
 
 // ! TODO: Implement Real Email!!
 
@@ -37,29 +38,13 @@ export class EmailerService {
             amountDue: highestBid.bidAmount,
             biddingHistory: user,
           });
-          console.log('Send congratulatory email to: ', user.user.username);
+          this.sendCongratsEmail(user, highestBid);
         } else {
-          console.log(
-            `Send email to ${user.user.username} saying the bidding for this item has been closed`,
-          );
+          this.sendBidClosedEmail(user, highestBid);
         }
       }
     }
     return;
-
-    // const dto: SendEmailDto = {
-    //   receipients: [
-    //     {
-    //       name: 'Tirivashe Shamhu',
-    //       address: 'shaymusts@gmail.com',
-    //     },
-    //   ],
-    //   subject: 'Tiri - Item Awarded',
-    //   html: '<p>Congratulations on winning the item!</p><p>Thank you for using Tiri</p>',
-    // };
-    // const res = await this.sendEmail(dto);
-    // console.log('Email sent!!!!');
-    // return res;
   }
 
   @OnEvent(BidEvents.CREATED, { async: true })
@@ -74,25 +59,29 @@ export class EmailerService {
         user.user.username,
         ' to notify them of the new bid',
       );
+      const dto: SendEmailDto = {
+        receipients: [
+          {
+            name: user.user.username,
+            address: user.user.email,
+          },
+        ],
+        subject: `${user.user.username} - Bid Created`,
+        html: `<p>Bid created on item ${createBiddingDto.itemId}</p>`,
+      };
+      await this.sendEmail(dto);
     }
-    // const dto: SendEmailDto = {
-    //   receipients: [
-    //     {
-    //       name: 'Tirivashe Shamhu',
-    //       address: 'shaymusts@gmail.com',
-    //     },
-    //   ],
-    //   subject: 'Tiri - Bid Created',
-    //   html: '<p>Bid created</p><p>Thank you for using Tiri</p>',
-    // };
-    // await this.sendEmail(dto);
   }
 
   @OnEvent(BidEvents.AUTO_BID_REACHED)
-  onAutoBidAmountReached() {}
+  onAutoBidAmountReached(user: BiddingHistory) {
+    this.sendAutoBidPercentageReachedEmail(user);
+  }
 
-  @OnEvent(BidEvents.AUTO_BID_EXCEDDED)
-  onAutoBidAmountExceeded() {}
+  @OnEvent(BidEvents.AUTO_BID_EXCEEDED)
+  onAutoBidAmountExceeded(history: BiddingHistory) {
+    this.sendAutoBidAmountExceededEmail(history);
+  }
   private emailTransport() {
     const transporter = nodemailer.createTransport({
       host: this.configService.get<string>('MAIL_HOST'),
@@ -135,6 +124,123 @@ export class EmailerService {
       .find({
         item: itemId,
       })
-      .populate('user');
+      .populate('user')
+      .populate('item');
+  }
+
+  private sendCongratsEmail(history: BiddingHistory, highestBid: Bid) {
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
+        </head>
+        <body style=3D"font-family: sans-serif;">
+          <div style=3D"display: block; margin: auto; max-width: 600px;" class=3D"main">
+            <h3 style=3D"font-size: 18px; font-weight: bold; margin-top: 20px">Congrats ${history.user.username}!</h3>
+            <p>You have won the ${highestBid.item.name}! You have won it for $${highestBid.bidAmount}</p>
+            <p>Good luck on you next bid and thank you for choosing us for auctioning.</p>
+          </div>
+        </body>
+      </html>`;
+    const dto: SendEmailDto = {
+      receipients: [
+        {
+          name: history.user.username,
+          address: history.user.email,
+        },
+      ],
+      subject: 'Congratulations!',
+      html,
+    };
+    this.sendEmail(dto);
+  }
+  private sendBidClosedEmail(history: BiddingHistory, highestBid: Bid) {
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
+        </head>
+        <body style=3D"font-family: sans-serif;">
+          <div style=3D"display: block; margin: auto; max-width: 600px;" class=3D"main">
+            <h3 style=3D"font-size: 18px; font-weight: bold; margin-top: 20px">Hello ${history.user.username}!</h3>
+            <p>Bidding for the ${highestBid.item.name} has closed!</p>
+            <p>Thank you for choosing us for auctioning.</p>
+          </div>
+        </body>
+      </html>`;
+    const dto: SendEmailDto = {
+      receipients: [
+        {
+          name: history.user.username,
+          address: history.user.email,
+        },
+      ],
+      subject: 'Bidding for item closed!',
+      html,
+    };
+    this.sendEmail(dto);
+  }
+  private sendAutoBidPercentageReachedEmail(history: BiddingHistory) {
+    // eslint-disable-next-line prettier/prettier
+    const bidStatus =
+      history.bidStatus === Status.InProgress
+        ? 'in progress'
+        : Status.Won
+          ? 'won'
+          : 'lost';
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
+        </head>
+        <body style=3D"font-family: sans-serif;">
+          <div style=3D"display: block; margin: auto; max-width: 600px;" class=3D"main">
+            <h3 style=3D"font-size: 18px; font-weight: bold; margin-top: 20px">Hello ${history.user.username}!</h3>
+            <p>Bidding for the ${history.item.name} has reached your set notification threshold. Currently the item bid has been ${bidStatus}</p>
+            <p>Thank you for choosing us for auctioning.</p>
+          </div>
+        </body>
+      </html>`;
+    const dto: SendEmailDto = {
+      receipients: [
+        {
+          name: history.user.username,
+          address: history.user.email,
+        },
+      ],
+      subject: 'Auto bid amount threshold reached!',
+      html,
+    };
+    this.sendEmail(dto);
+  }
+  private sendAutoBidAmountExceededEmail(history: BiddingHistory) {
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
+        </head>
+        <body style=3D"font-family: sans-serif;">
+          <div style=3D"display: block; margin: auto; max-width: 600px;" class=3D"main">
+            <h3 style=3D"font-size: 18px; font-weight: bold; margin-top: 20px">Hi ${history.user.username}!</h3>
+            <p>This is to let you know your maximum bidding amount for ${history.item.name} has exceeded! Auto bidding has been disabled</p>
+            <p>Thank you for choosing us for auctioning.</p>
+          </div>
+        </body>
+      </html>`;
+    const dto: SendEmailDto = {
+      receipients: [
+        {
+          name: history.user.username,
+          address: history.user.email,
+        },
+      ],
+      subject: 'Maximum bid amount exceeded!',
+      html,
+    };
+    this.sendEmail(dto);
   }
 }
