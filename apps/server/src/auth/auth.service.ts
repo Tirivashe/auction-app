@@ -21,6 +21,10 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto): Promise<{ token: string; user: User }> {
     const { email, password, username, role } = signUpDto;
     try {
+      const existingUser = await this.userModel.findOne({ email });
+      if (existingUser) {
+        throw new UnauthorizedException('User already exists');
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await this.userModel.create({
         email,
@@ -33,7 +37,11 @@ export class AuthService {
 
       return { token, user: createdUser };
     } catch (error) {
-      throw new InternalServerErrorException('Something went wrong');
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Something went wrong');
+      }
     }
   }
 
