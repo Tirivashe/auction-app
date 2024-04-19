@@ -14,8 +14,6 @@ import { BillingEvents } from 'src/billing/events/billing.events';
 import { CreateBiddingDto } from 'src/bidding/dto/create-bidding.dto';
 import { Status } from 'src/types';
 
-// ! TODO: Implement Real Email!!
-
 @Injectable()
 export class EmailerService {
   constructor(

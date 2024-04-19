@@ -28,7 +28,6 @@ export class BiddingService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  // TODO: Make this run concurrently correctly
   async onCreateBid(createBiddingDto: CreateBiddingDto, server: Server) {
     const allBidsForItem = await this.bidModel.find({
       item: createBiddingDto.itemId,

@@ -12,7 +12,6 @@ import { ConfigModule } from '@nestjs/config';
 import { BillingModule } from './billing/billing.module';
 import { BiddingModule } from './bidding/bidding.module';
 
-// TODO: Change the mongo connection string to mongo atlas later
 @Module({
   imports: [
     ConfigModule.forRoot(),
