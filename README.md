@@ -32,3 +32,4 @@ While the development of this application was tricky with 'gotchas' in a few pla
 
 2. Access tokens are being saved within local storage. Much like the aformentioned env variables, the same applies here. The access token is added in local storage for the convenience of the application and testing
 3. Email notifications within the application. While the implementation is present, finding a reliable email provider was difficult for the purposes of testing the application. There was also the possibility of using fake emails just for testing out this application, so I decided to go with Mailtrap. Since the provider was limited, feel free to use any mail provider of your choice and add the credentials in the .env file to test email notification functionality.
+4. Image upload. I simply could not get this to work, I wish I had someone I could have consulted about this one. Unfortunately
