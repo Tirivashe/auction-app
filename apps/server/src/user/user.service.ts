@@ -35,9 +35,9 @@ export class UserService {
     });
   }
 
-  async findUserSettingsById(id: string) {
+  async findUserSettingsById(id: string): Promise<UserSettings> {
     const user = await this.userModel.findById(id);
-    return await this.userSettingsModel.find({ user: user._id });
+    return await this.userSettingsModel.findOne({ user: user._id });
   }
 
   async setUserSettings(userId: string, userSettingsDto: UserSettingsDto) {
