@@ -17,6 +17,7 @@ import { useAuthStore } from "../../../store";
 import { useNavigate } from "react-router-dom";
 import { navigateUserOnAuth } from "../../../utils";
 import { useLogin } from "../../../hooks/useLogin";
+import { setAuthToken } from "../../../api/constants";
 
 type LoginFormValues = {
   email: string;
@@ -30,6 +31,7 @@ type Props = {
 export function Login({ changeForm }: Props) {
   const setAuth = useAuthStore((state) => state.setAuthResponse);
   const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
   const navigate = useNavigate();
   const form = useForm<LoginFormValues>({
     mode: "uncontrolled",
@@ -63,11 +65,12 @@ export function Login({ changeForm }: Props) {
   }, [error?.message, isError, form, data, setAuth]);
 
   useEffect(() => {
-    if (user === null) {
+    if (token === null || user === null) {
       return;
     }
+    setAuthToken(token);
     navigateUserOnAuth(user, navigate);
-  }, [user, navigate]);
+  }, [user, navigate, token]);
 
   return (
     <Container size={520} w="100%">

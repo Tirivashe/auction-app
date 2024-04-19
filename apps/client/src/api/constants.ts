@@ -10,3 +10,10 @@ export const axiosInstance = axios.create({
     Authorization: `Bearer ${parseAuthStorage?.state.token || ""}`,
   },
 });
+
+export const setAuthToken = (token: string) => {
+  axiosInstance.interceptors.request.use((config) => {
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
+};
