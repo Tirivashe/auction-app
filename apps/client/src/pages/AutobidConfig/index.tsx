@@ -7,7 +7,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useFetchUserAutobidConfig from "../../hooks/useFetchUserAutobidConfig";
 import useSetUserAutobidConfig from "../../hooks/useSetUserAutobidConfig";
 
@@ -21,6 +21,7 @@ const AutobidConfigPage = () => {
   const [amount, setAmount] = useState(config?.maxBidAmount ?? 1);
   const [percentage, setPercentage] = useState(config?.autoBidPercentage ?? 1);
   const { mutate } = useSetUserAutobidConfig(id ?? "", amount, percentage);
+  const navigate = useNavigate();
 
   if (isError) {
     return <div>Something went wrong</div>;
@@ -29,9 +30,23 @@ const AutobidConfigPage = () => {
     return <div>Loading...</div>;
   }
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutate();
+    navigate(-1);
+  };
+
   return (
     <Center mt="5rem">
-      <Paper withBorder radius="lg" shadow="xl" maw="70%" p="lg">
+      <Paper
+        withBorder
+        radius="lg"
+        shadow="xl"
+        maw="70%"
+        p="lg"
+        component="form"
+        onSubmit={handleSubmit}
+      >
         <Stack gap="lg">
           <Title ta="center" fz="h2">
             Configure Bidding Settings
@@ -57,7 +72,7 @@ const AutobidConfigPage = () => {
             placeholder={config?.autoBidPercentage?.toString()}
             onChange={(e) => setPercentage(e as number)}
           />
-          <Button fullWidth onClick={() => mutate()}>
+          <Button fullWidth type="submit">
             Submit
           </Button>
         </Stack>
