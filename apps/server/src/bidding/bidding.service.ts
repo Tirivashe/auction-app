@@ -75,6 +75,8 @@ export class BiddingService {
         this.eventEmitter.emit(BidEvents.AUTO_BID_EXCEEDED, user.user._id);
         continue;
       }
+      settings.totalAmountReserved += nextBidAmount;
+      await settings.save();
       await this.onCreateBid(
         {
           userId: user.user._id.toString(),
@@ -83,17 +85,6 @@ export class BiddingService {
         },
         this.server,
       );
-      const session = await this.connection.startSession();
-      session.startTransaction();
-      try {
-        settings.totalAmountReserved += nextBidAmount;
-        await settings.save({ session });
-        await session.commitTransaction();
-      } catch (error) {
-        await session.abortTransaction();
-      } finally {
-        session.endSession();
-      }
       this.eventEmitter.emit(BidEvents.CREATED, createBiddingDto);
       this.server.emit('bid.created');
     }
