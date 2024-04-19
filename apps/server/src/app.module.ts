@@ -5,7 +5,6 @@ import { AuthModule } from './auth/auth.module';
 import { ItemModule } from './item/item.module';
 import { BidModule } from './bid/bid.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { NotificationModule } from './notification/notification.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailerModule } from './emailer/emailer.module';
@@ -26,7 +25,6 @@ import { BiddingModule } from './bidding/bidding.module';
     AuthModule,
     ItemModule,
     BidModule,
-    NotificationModule,
     SchedulerModule,
     EmailerModule,
     BillingModule,
