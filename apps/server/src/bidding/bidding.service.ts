@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBiddingDto } from './dto/create-bidding.dto';
 // import { UpdateBiddingDto } from './dto/update-bidding.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
@@ -37,7 +37,10 @@ export class BiddingService {
       createBiddingDto,
       allBidsForItem,
     );
-    if (!canBid) throw new BadRequestException(message);
+    if (!canBid) {
+      server.emit('error', message);
+      return;
+    }
     const session = await this.connection.startSession();
     session.startTransaction();
     try {

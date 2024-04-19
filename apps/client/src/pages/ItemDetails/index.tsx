@@ -25,7 +25,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import BidsList from "../../components/BidsList";
 import { useAuthStore } from "../../store";
 import useToggleAutoBid from "../../hooks/useToggleAutoBid";
-import { IconSettings } from "@tabler/icons-react";
+import { IconExclamationCircle, IconSettings } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
 
 const ItemDetailsPage = () => {
   const { id } = useParams();
@@ -98,9 +99,20 @@ const ItemDetailsPage = () => {
       queryClient.invalidateQueries({ queryKey: ["bids"] });
     });
 
+    socket.on("error", (message: string) => {
+      notifications.show({
+        title: "Oops!!",
+        message,
+        icon: <IconExclamationCircle color="red" size={40} />,
+        color: "white",
+        withBorder: true,
+      });
+    });
+
     return () => {
       socket.off("connect");
       socket.off("bid.created");
+      socket.off("error");
     };
   }, [socket, queryClient]);
 
